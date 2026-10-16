@@ -1,0 +1,253 @@
+import type {
+  Amendment,
+  Meeting,
+  Member,
+  Milestone,
+  Note,
+  Project,
+  Role,
+  Task,
+  TestCase,
+} from "./types"
+
+export const TODAY = "2026-10-16"
+
+export const MEMBERS: Member[] = [
+  { id: "u1", name: "Karim Maser", initials: "KM", role: "Admin", title: "Managing Director" },
+  { id: "u2", name: "Sophie Laurent", initials: "SL", role: "Manager", title: "Project Manager" },
+  { id: "u3", name: "Julien Moreau", initials: "JM", role: "Collaborator", title: "Structural Engineer" },
+  { id: "u4", name: "Amina Benali", initials: "AB", role: "Collaborator", title: "QA Engineer" },
+  { id: "u5", name: "Lucas Petit", initials: "LP", role: "Collaborator", title: "Electrical Engineer" },
+  { id: "u6", name: "Nora Haddad", initials: "NH", role: "Manager", title: "Project Manager" },
+  { id: "u7", name: "Marc Fontaine", initials: "MF", role: "Client", title: "Operations Director", company: "Helios Energy" },
+]
+
+export const CURRENT_USER_BY_ROLE: Record<Role, string> = {
+  Admin: "u1",
+  Manager: "u2",
+  Collaborator: "u3",
+  Client: "u7",
+}
+
+export const PROJECTS: Project[] = [
+  {
+    id: "p1",
+    code: "MSR-2401",
+    name: "Solar Farm Substation Upgrade",
+    client: "Helios Energy",
+    description:
+      "Design and commissioning of a 33/132 kV substation extension to connect the new 48 MW photovoltaic array to the regional grid.",
+    status: "In Progress",
+    priority: "High",
+    startDate: "2026-08-03",
+    endDate: "2026-12-18",
+    tags: ["Electrical", "HV", "Renewables"],
+    memberIds: ["u2", "u3", "u4", "u5"],
+    budget: 1850000,
+  },
+  {
+    id: "p2",
+    code: "MSR-2402",
+    name: "Rail Depot Structural Retrofit",
+    client: "Nordline Rail",
+    description:
+      "Seismic retrofit of the main maintenance hall including steel frame reinforcement and foundation underpinning.",
+    status: "In Progress",
+    priority: "Medium",
+    startDate: "2026-07-01",
+    endDate: "2027-01-29",
+    tags: ["Structural", "Seismic"],
+    memberIds: ["u6", "u3", "u4"],
+    budget: 2400000,
+  },
+  {
+    id: "p3",
+    code: "MSR-2403",
+    name: "Water Treatment SCADA Migration",
+    client: "Aquaterra Water",
+    description:
+      "Migration of legacy PLC control systems to a redundant SCADA architecture across three treatment plants.",
+    status: "In Progress",
+    priority: "High",
+    startDate: "2026-09-07",
+    endDate: "2026-11-27",
+    tags: ["Automation", "SCADA"],
+    memberIds: ["u2", "u5", "u4"],
+    budget: 960000,
+  },
+  {
+    id: "p4",
+    code: "MSR-2404",
+    name: "Logistics Hub HVAC Design",
+    client: "Vantage Logistics",
+    description: "Full mechanical and HVAC design package for a 40,000 m² automated logistics hub.",
+    status: "In Progress",
+    priority: "Low",
+    startDate: "2026-09-21",
+    endDate: "2027-02-12",
+    tags: ["Mechanical", "HVAC"],
+    memberIds: ["u6", "u3"],
+    budget: 540000,
+  },
+  {
+    id: "p5",
+    code: "MSR-2305",
+    name: "Battery Storage Feasibility Study",
+    client: "Helios Energy",
+    description: "Technical and economic feasibility of a 20 MWh battery energy storage system.",
+    status: "Closed",
+    priority: "Medium",
+    startDate: "2026-03-02",
+    endDate: "2026-06-26",
+    tags: ["Study", "Renewables"],
+    memberIds: ["u2", "u5"],
+    budget: 180000,
+  },
+  {
+    id: "p6",
+    code: "MSR-2209",
+    name: "Urban Footbridge Inspection",
+    client: "Cité Urbaine",
+    description: "Condition assessment and load testing of the municipal pedestrian bridge network.",
+    status: "Archived",
+    priority: "Low",
+    startDate: "2025-11-03",
+    endDate: "2026-02-20",
+    tags: ["Structural", "Inspection"],
+    memberIds: ["u6", "u4"],
+    budget: 95000,
+  },
+]
+
+export const TASKS: Task[] = [
+  { id: "t1", projectId: "p1", title: "Single-line diagram revision C", status: "Done", priority: "High", assigneeId: "u5", startDate: "2026-08-03", dueDate: "2026-08-28" },
+  { id: "t2", projectId: "p1", title: "Transformer foundation design", status: "Done", priority: "High", assigneeId: "u3", startDate: "2026-08-17", dueDate: "2026-09-18" },
+  { id: "t3", projectId: "p1", title: "Protection relay coordination study", status: "Review", priority: "High", assigneeId: "u5", startDate: "2026-09-14", dueDate: "2026-10-23" },
+  { id: "t4", projectId: "p1", title: "Earthing grid calculation", status: "In Progress", priority: "Medium", assigneeId: "u3", startDate: "2026-09-28", dueDate: "2026-10-30" },
+  { id: "t5", projectId: "p1", title: "Factory acceptance test plan", status: "In Progress", priority: "Medium", assigneeId: "u4", startDate: "2026-10-05", dueDate: "2026-11-06" },
+  { id: "t6", projectId: "p1", title: "Cable routing & trench layout", status: "To Do", priority: "Medium", assigneeId: "u3", startDate: "2026-10-26", dueDate: "2026-11-20" },
+  { id: "t7", projectId: "p1", title: "Site energisation procedure", status: "To Do", priority: "High", assigneeId: "u5", startDate: "2026-11-16", dueDate: "2026-12-11" },
+  { id: "t8", projectId: "p2", title: "Existing frame survey", status: "Done", priority: "High", assigneeId: "u3", startDate: "2026-07-01", dueDate: "2026-07-31" },
+  { id: "t9", projectId: "p2", title: "Finite element model", status: "In Progress", priority: "High", assigneeId: "u3", startDate: "2026-08-10", dueDate: "2026-10-30" },
+  { id: "t10", projectId: "p2", title: "Underpinning method statement", status: "To Do", priority: "Medium", assigneeId: "u6", startDate: "2026-11-02", dueDate: "2026-12-04" },
+  { id: "t11", projectId: "p2", title: "Load test procedure", status: "Review", priority: "Low", assigneeId: "u4", startDate: "2026-09-21", dueDate: "2026-10-20" },
+  { id: "t12", projectId: "p3", title: "I/O list consolidation", status: "Done", priority: "Medium", assigneeId: "u5", startDate: "2026-09-07", dueDate: "2026-09-25" },
+  { id: "t13", projectId: "p3", title: "Redundant server configuration", status: "In Progress", priority: "High", assigneeId: "u5", startDate: "2026-09-28", dueDate: "2026-10-23" },
+  { id: "t14", projectId: "p3", title: "HMI screen migration", status: "In Progress", priority: "Medium", assigneeId: "u4", startDate: "2026-10-05", dueDate: "2026-11-06" },
+  { id: "t15", projectId: "p3", title: "Cutover plan — Plant B", status: "To Do", priority: "High", assigneeId: "u2", startDate: "2026-11-02", dueDate: "2026-11-20" },
+  { id: "t16", projectId: "p4", title: "Heat load calculations", status: "In Progress", priority: "Medium", assigneeId: "u3", startDate: "2026-09-21", dueDate: "2026-10-30" },
+  { id: "t17", projectId: "p4", title: "Ductwork concept layout", status: "To Do", priority: "Low", assigneeId: "u3", startDate: "2026-11-02", dueDate: "2026-12-18" },
+  { id: "t18", projectId: "p5", title: "Final feasibility report", status: "Done", priority: "High", assigneeId: "u2", startDate: "2026-05-04", dueDate: "2026-06-26" },
+  { id: "t19", projectId: "p6", title: "Inspection report", status: "Done", priority: "Medium", assigneeId: "u4", startDate: "2025-12-01", dueDate: "2026-02-20" },
+]
+
+export const TESTS: TestCase[] = [
+  { id: "q1", projectId: "p1", campaign: "FAT — Switchgear", name: "Insulation resistance test", status: "Passed", priority: "High", assigneeId: "u4", lastRun: "2026-10-08" },
+  { id: "q2", projectId: "p1", campaign: "FAT — Switchgear", name: "Breaker timing test", status: "Failed", priority: "High", assigneeId: "u4", lastRun: "2026-10-09" },
+  { id: "q3", projectId: "p1", campaign: "FAT — Protection", name: "Overcurrent relay injection", status: "Pending", priority: "High", assigneeId: "u5", lastRun: "" },
+  { id: "q4", projectId: "p1", campaign: "FAT — Protection", name: "Differential relay stability", status: "Pending", priority: "Medium", assigneeId: "u5", lastRun: "" },
+  { id: "q5", projectId: "p1", campaign: "Civil QA", name: "Concrete cube strength 28d", status: "Passed", priority: "Medium", assigneeId: "u3", lastRun: "2026-10-02" },
+  { id: "q6", projectId: "p2", campaign: "Material QA", name: "Weld ultrasonic inspection", status: "Passed", priority: "High", assigneeId: "u4", lastRun: "2026-09-30" },
+  { id: "q7", projectId: "p2", campaign: "Material QA", name: "Bolt torque verification", status: "Pending", priority: "Medium", assigneeId: "u4", lastRun: "" },
+  { id: "q8", projectId: "p3", campaign: "SAT — Plant A", name: "Server failover switchover", status: "Failed", priority: "High", assigneeId: "u5", lastRun: "2026-10-12" },
+  { id: "q9", projectId: "p3", campaign: "SAT — Plant A", name: "Alarm historian logging", status: "Passed", priority: "Medium", assigneeId: "u4", lastRun: "2026-10-12" },
+  { id: "q10", projectId: "p3", campaign: "SAT — Plant A", name: "HMI navigation regression", status: "Pending", priority: "Low", assigneeId: "u4", lastRun: "" },
+]
+
+export const NOTES: Note[] = [
+  {
+    id: "n1",
+    projectId: "p1",
+    authorId: "u5",
+    category: "Technical",
+    content:
+      "Relay coordination model updated with the grid operator's revised fault levels (31.5 kA). Settings for feeders F3–F6 need re-validation before FAT.",
+    createdAt: "2026-10-14T09:42:00",
+    comments: [
+      { id: "c1", authorId: "u2", content: "Thanks Lucas — can we have the revised settings sheet by Tuesday?", createdAt: "2026-10-14T11:05:00" },
+    ],
+  },
+  {
+    id: "n2",
+    projectId: "p1",
+    authorId: "u7",
+    category: "Client",
+    content:
+      "Our site team confirms access to the north compound will be available from 2 November. Please coordinate crane deliveries with our HSE officer.",
+    createdAt: "2026-10-13T16:20:00",
+    comments: [],
+  },
+  {
+    id: "n3",
+    projectId: "p1",
+    authorId: "u3",
+    category: "Site Visit",
+    content:
+      "Site visit completed. Transformer plinth formwork is in place; rebar inspection passed. Minor drainage clash identified near bay 2 — sketch attached to the drawing register.",
+    createdAt: "2026-10-10T14:00:00",
+    comments: [
+      { id: "c2", authorId: "u5", content: "I'll check the cable trench levels against that clash.", createdAt: "2026-10-10T15:30:00" },
+    ],
+  },
+  {
+    id: "n4",
+    projectId: "p1",
+    authorId: "u2",
+    category: "Decision",
+    content: "Agreed with Helios to move from SF6 to vacuum circuit breakers for the 33 kV switchboard. Amendment AV-003 raised.",
+    createdAt: "2026-10-06T10:15:00",
+    comments: [],
+  },
+  {
+    id: "n5",
+    projectId: "p2",
+    authorId: "u3",
+    category: "Technical",
+    content: "FE model shows column C4 utilisation at 1.08 under the new seismic spectrum. Proposing additional bracing in grid line C.",
+    createdAt: "2026-10-12T08:30:00",
+    comments: [],
+  },
+  {
+    id: "n6",
+    projectId: "p3",
+    authorId: "u5",
+    category: "Technical",
+    content: "Failover test on Plant A failed due to a heartbeat timeout misconfiguration. Fix deployed in staging, retest scheduled.",
+    createdAt: "2026-10-12T17:45:00",
+    comments: [],
+  },
+]
+
+export const AMENDMENTS: Amendment[] = [
+  { id: "a1", projectId: "p1", ref: "AV-001", title: "Additional 33 kV feeder bay", type: "Scope", status: "Approved", amount: 142000, daysImpact: 10, requestedBy: "u7", createdAt: "2026-08-24" },
+  { id: "a2", projectId: "p1", ref: "AV-002", title: "Delayed grid connection agreement", type: "Schedule", status: "Approved", amount: 0, daysImpact: 14, requestedBy: "u2", createdAt: "2026-09-15" },
+  { id: "a3", projectId: "p1", ref: "AV-003", title: "Switch to vacuum circuit breakers", type: "Budget", status: "Pending Approval", amount: 68500, daysImpact: 0, requestedBy: "u2", createdAt: "2026-10-06" },
+  { id: "a4", projectId: "p1", ref: "AV-004", title: "Extended SCADA integration", type: "Scope", status: "Draft", amount: 37000, daysImpact: 5, requestedBy: "u5", createdAt: "2026-10-14" },
+  { id: "a5", projectId: "p2", ref: "AV-001", title: "Additional bracing at grid line C", type: "Scope", status: "Pending Approval", amount: 215000, daysImpact: 21, requestedBy: "u6", createdAt: "2026-10-13" },
+  { id: "a6", projectId: "p3", ref: "AV-001", title: "Third plant cutover rescheduled", type: "Schedule", status: "Draft", amount: 0, daysImpact: 7, requestedBy: "u2", createdAt: "2026-10-11" },
+]
+
+export const MEETINGS: Meeting[] = [
+  { id: "m1", projectId: "p1", title: "Weekly coordination", start: "2026-10-19T09:30:00", durationMin: 60, location: "Google Meet", attendeeIds: ["u2", "u3", "u5"] },
+  { id: "m2", projectId: "p1", title: "Client progress review", start: "2026-10-21T14:00:00", durationMin: 90, location: "Helios HQ — Room 4B", attendeeIds: ["u2", "u7", "u5"] },
+  { id: "m3", projectId: "p1", title: "FAT readiness review", start: "2026-10-28T10:00:00", durationMin: 60, location: "Maser Engineering office", attendeeIds: ["u4", "u5", "u2"] },
+  { id: "m4", projectId: "p2", title: "Seismic design workshop", start: "2026-10-20T13:00:00", durationMin: 120, location: "Google Meet", attendeeIds: ["u6", "u3"] },
+  { id: "m5", projectId: "p3", title: "Failover retest debrief", start: "2026-10-22T11:00:00", durationMin: 45, location: "Plant A control room", attendeeIds: ["u5", "u4", "u2"] },
+  { id: "m6", projectId: "p1", title: "Kick-off meeting", start: "2026-08-04T10:00:00", durationMin: 120, location: "Helios HQ", attendeeIds: ["u2", "u3", "u5", "u7"] },
+]
+
+export const MILESTONES: Milestone[] = [
+  { id: "ms1", projectId: "p1", title: "Design freeze", date: "2026-09-25" },
+  { id: "ms2", projectId: "p1", title: "Factory acceptance", date: "2026-11-09" },
+  { id: "ms3", projectId: "p1", title: "Energisation", date: "2026-12-14" },
+  { id: "ms4", projectId: "p2", title: "Design approval", date: "2026-11-13" },
+  { id: "ms5", projectId: "p3", title: "Plant A go-live", date: "2026-10-30" },
+  { id: "ms6", projectId: "p4", title: "Concept review", date: "2026-11-27" },
+]
+
+export const NOTIFICATIONS = [
+  { id: "nt1", title: "Breaker timing test failed", detail: "Solar Farm Substation Upgrade · FAT — Switchgear", time: "2h ago", unread: true },
+  { id: "nt2", title: "Amendment AV-001 awaiting approval", detail: "Rail Depot Structural Retrofit", time: "Yesterday", unread: true },
+  { id: "nt3", title: "Marc Fontaine added a note", detail: "Solar Farm Substation Upgrade", time: "3 days ago", unread: true },
+  { id: "nt4", title: "Task moved to Review", detail: "Protection relay coordination study", time: "4 days ago", unread: false },
+]
