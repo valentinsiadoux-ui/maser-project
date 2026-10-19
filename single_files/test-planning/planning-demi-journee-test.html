@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4f4c4d">
+  <title>Half-day planning · Prototype · Maser Engineering</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e63641'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Préférences d'affichage (thème, palette, taille, position du menu) partagées entre les pages -->
+  <script>
+    try {
+      var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
+      if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
+      if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
+      if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+      if (p.navLayout && p.navLayout !== 'side') e.setAttribute('data-nav', p.navLayout);
+    } catch (_) {}
+  </script>
+
+  <!-- ===================================================================
+       1) Tokens de couleur Maser Engineering (CSS natif, clair / sombre)
+       =================================================================== -->
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f6f6f6, #1c1b1b);
+      --foreground: light-dark(#2b2929, #f6f6f6);
+      --card: light-dark(#ffffff, #272525);
+      --card-foreground: var(--foreground);
+      --popover: var(--card);
+      --popover-foreground: var(--foreground);
+      --primary: #e63641;
+      --primary-foreground: #ffffff;
+      --alt: light-dark(#4f4c4d, #b5b2b3);
+      --secondary: light-dark(#f6f6f6, #333031);
+      --secondary-foreground: var(--alt);
+      --muted: light-dark(#f6f6f6, #333031);
+      --muted-foreground: light-dark(#6f6c6d, #aaa7a8);
+      --accent: light-dark(#f6f6f6, #333031);
+      --accent-foreground: var(--foreground);
+      --success: oklch(0.6 0.13 163);
+      --success-foreground: #ffffff;
+      --warning: oklch(0.75 0.15 70);
+      --warning-foreground: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive: oklch(0.58 0.22 27);
+      --border: light-dark(#e6e5e5, #3d3a3b);
+      --input: light-dark(#e6e5e5, #3d3a3b);
+      --ring: #e63641;
+      --chart-1: #e63641;
+      --chart-2: oklch(0.6 0.13 163);
+      --chart-3: oklch(0.75 0.15 70);
+      --chart-4: oklch(0.58 0.22 27);
+      --chart-5: oklch(0.6 0.1 240);
+      /* textes de badges : teinte mélangée au texte */
+      --alt-ink: color-mix(in oklch, var(--alt) 65%, var(--foreground));
+      --success-ink: color-mix(in oklch, var(--success) 65%, var(--foreground));
+      --warning-ink: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive-ink: color-mix(in oklch, var(--destructive) 65%, var(--foreground));
+      --chart-5-ink: color-mix(in oklch, var(--chart-5) 65%, var(--foreground));
+      --muted-ink: color-mix(in oklch, var(--muted-foreground) 65%, var(--foreground));
+      --sidebar: #4f4c4d;
+      --sidebar-foreground: #f6f6f6;
+      --sidebar-primary: #e63641;
+      --sidebar-primary-foreground: #ffffff;
+      --sidebar-accent: #625f60;
+      --sidebar-accent-foreground: #ffffff;
+      --sidebar-border: #625f60;
+      --sidebar-ring: #e63641;
+      --radius: 0.5rem;
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"]  { color-scheme: dark; }
+
+    /* Palettes alternatives (Settings > Appearance) */
+    :root[data-palette="ocean"]   { --background: light-dark(#f4f6f9, #121820); --foreground: light-dark(#1b2430, #f1f5f9); --card: light-dark(#fff, #1b232d); --primary: #2f6fe4; --alt: light-dark(#475569, #cbd5e1); --secondary: light-dark(#eef1f6, #263040); --muted: light-dark(#eef1f6, #263040); --muted-foreground: light-dark(#64748b, #94a3b8); --accent: light-dark(#eef1f6, #263040); --border: light-dark(#dde3ec, #334155); --input: light-dark(#dde3ec, #334155); --ring: #2f6fe4; --chart-1: #2f6fe4; --sidebar: #1e293b; --sidebar-foreground: #e2e8f0; --sidebar-primary: #4f8df5; --sidebar-accent: #334155; --sidebar-border: #334155; --sidebar-ring: #4f8df5; }
+    :root[data-palette="forest"]  { --background: light-dark(#f5f6f3, #141a16); --foreground: light-dark(#232a25, #f3f6f3); --card: light-dark(#fff, #1e2520); --primary: #1f8a5b; --alt: light-dark(#4a5a50, #bccbc2); --secondary: light-dark(#eef1ec, #2a332d); --muted: light-dark(#eef1ec, #2a332d); --muted-foreground: light-dark(#6b7770, #9aa8a0); --accent: light-dark(#eef1ec, #2a332d); --border: light-dark(#e0e5de, #36413a); --input: light-dark(#e0e5de, #36413a); --ring: #1f8a5b; --chart-1: #1f8a5b; --sidebar: #24332b; --sidebar-foreground: #e8f0ea; --sidebar-primary: #3cb782; --sidebar-accent: #34473c; --sidebar-border: #34473c; --sidebar-ring: #3cb782; }
+    :root[data-palette="sunset"]  { --background: light-dark(#f7f5f2, #1c1916); --foreground: light-dark(#2d2825, #f7f3ee); --card: light-dark(#fff, #28231f); --primary: #d9480f; --alt: light-dark(#5c5148, #d3c8bc); --secondary: light-dark(#f1ece6, #38312a); --muted: light-dark(#f1ece6, #38312a); --muted-foreground: light-dark(#7a6f66, #b2a69a); --accent: light-dark(#f1ece6, #38312a); --border: light-dark(#e8e0d7, #4a4137); --input: light-dark(#e8e0d7, #4a4137); --ring: #d9480f; --chart-1: #d9480f; --sidebar: #3b322b; --sidebar-foreground: #f4ece3; --sidebar-primary: #f0702e; --sidebar-accent: #51463c; --sidebar-border: #51463c; --sidebar-ring: #f0702e; }
+    :root[data-palette="violet"]  { --background: light-dark(#f6f5f9, #16141c); --foreground: light-dark(#272433, #f4f2fa); --card: light-dark(#fff, #211e2b); --primary: #7c3aed; --alt: light-dark(#4f4a63, #cdc9de); --secondary: light-dark(#efedf5, #2f2b3b); --muted: light-dark(#efedf5, #2f2b3b); --muted-foreground: light-dark(#6f6a80, #a39fb5); --accent: light-dark(#efedf5, #2f2b3b); --border: light-dark(#e3e0ec, #3d3850); --input: light-dark(#e3e0ec, #3d3850); --ring: #7c3aed; --chart-1: #7c3aed; --sidebar: #2e2a40; --sidebar-foreground: #ece9f6; --sidebar-primary: #9d6bf5; --sidebar-accent: #453f5e; --sidebar-border: #453f5e; --sidebar-ring: #9d6bf5; }
+    :root[data-palette="graphite"]{ --primary: light-dark(#2b2929, #f6f6f6); --primary-foreground: light-dark(#fff, #1c1b1b); --ring: light-dark(#6f6c6d, #aaa7a8); --chart-1: light-dark(#4f4c4d, #cfcdce); --sidebar: #1c1b1b; --sidebar-foreground: #d9d8d8; --sidebar-primary: #f6f6f6; --sidebar-primary-foreground: #1c1b1b; --sidebar-accent: #333031; --sidebar-border: #333031; --sidebar-ring: #aaa7a8; }
+
+    :root[data-density="compact"] { font-size: 14.5px; }
+    :root[data-density="large"]   { font-size: 17px; }
+
+    [x-cloak] { display: none !important; }
+    /* icônes Lucide (sprite SVG) */
+    .i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- ===================================================================
+       2) Tailwind CSS (CDN) + configuration du thème
+       =================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-alt: var(--alt);
+      --color-success: var(--success);
+      --color-success-foreground: var(--success-foreground);
+      --color-warning: var(--warning);
+      --color-warning-foreground: var(--warning-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --color-chart-1: var(--chart-1);
+      --color-chart-2: var(--chart-2);
+      --color-chart-3: var(--chart-3);
+      --color-chart-4: var(--chart-4);
+      --color-chart-5: var(--chart-5);
+      --color-alt-ink: var(--alt-ink);
+      --color-success-ink: var(--success-ink);
+      --color-warning-ink: var(--warning-ink);
+      --color-destructive-ink: var(--destructive-ink);
+      --color-chart-5-ink: var(--chart-5-ink);
+      --color-muted-ink: var(--muted-ink);
+      --color-sidebar: var(--sidebar);
+      --color-sidebar-foreground: var(--sidebar-foreground);
+      --color-sidebar-primary: var(--sidebar-primary);
+      --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+      --color-sidebar-accent: var(--sidebar-accent);
+      --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+      --color-sidebar-border: var(--sidebar-border);
+      --color-sidebar-ring: var(--sidebar-ring);
+
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+      --radius-3xl: calc(var(--radius) * 2.2);
+      --radius-4xl: calc(var(--radius) * 2.6);
+
+      /* Alias des noms de couleurs FlyonUI (migration future sans retouche) */
+      --color-base-100: var(--card);
+      --color-base-200: var(--background);
+      --color-base-300: var(--border);
+      --color-base-content: var(--foreground);
+      --color-error: var(--destructive);
+      --color-info: var(--chart-5);
+    }
+
+    @layer base {
+      *, ::after, ::before { border-color: var(--border); }
+      * { outline-color: color-mix(in oklab, var(--ring) 50%, transparent); }
+      body { @apply bg-background text-foreground font-sans antialiased; }
+    }
+
+    /* ---------------------------------------------------------------
+       Classes sémantiques compatibles FlyonUI (btn, input, card, badge…).
+       FlyonUI est un plugin Tailwind sans version CDN : ce bloc reproduit
+       son API de classes avec le thème Maser. Avec une étape de build
+       (npm i flyonui + @plugin "flyonui") il peut être supprimé.
+       --------------------------------------------------------------- */
+    @layer components {
+      .btn { @apply inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50; }
+      .btn svg { @apply pointer-events-none size-4 shrink-0; }
+      .btn-sm { @apply h-7 gap-1 px-2.5 text-[0.8rem]; }
+      .btn-sm svg { @apply size-3.5; }
+      .btn-lg { @apply h-10; }
+      .btn-square { @apply size-8 px-0; }
+      .btn-block { @apply w-full; }
+      .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/80; }
+      .btn-outline { @apply border-border bg-card text-foreground hover:bg-muted; }
+      .btn-text { @apply text-foreground hover:bg-muted; }
+      .input { @apply h-8 w-full min-w-0 rounded-lg border border-input bg-muted px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm; }
+      .textarea { @apply min-h-16 w-full rounded-lg border border-input bg-muted px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; }
+      .select { @apply h-8 w-full min-w-0 appearance-none rounded-lg border border-input bg-muted bg-no-repeat px-2.5 py-1 pr-8 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 0.5rem center; }
+      .label-text { @apply text-sm leading-none font-medium select-none; }
+      .card { @apply flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10; }
+      .badge { @apply inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
+      .badge-outline { @apply border-border text-foreground; }
+      .badge-secondary { @apply bg-secondary text-secondary-foreground; }
+      .menu-item { @apply flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-none select-none hover:bg-accent focus:bg-accent; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }
+  </style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/flyonui@2.4.1/flyonui.js"></script>
+  <script>
+    const DATA = {"members":[{"id":"u1","name":"Karim Maser","initials":"KM","role":"Admin","title":"Managing Director"},{"id":"u2","name":"Sophie Laurent","initials":"SL","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u3","name":"Julien Moreau","initials":"JM","role":"Collaborator","title":"Structural Engineer","supervisorId":"u6"},{"id":"u4","name":"Amina Benali","initials":"AB","role":"Collaborator","title":"QA Engineer","supervisorId":"u2"},{"id":"u5","name":"Lucas Petit","initials":"LP","role":"Collaborator","title":"Electrical Engineer","supervisorId":"u2"},{"id":"u6","name":"Nora Haddad","initials":"NH","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u7","name":"Marc Fontaine","initials":"MF","role":"Client","title":"Operations Director"}],"projects":[{"id":"p1","code":"MSR-2401","name":"Solar Farm Substation Upgrade","status":"In Progress","memberIds":["u2","u3","u4","u5"]},{"id":"p2","code":"MSR-2402","name":"Rail Depot Structural Retrofit","status":"In Progress","memberIds":["u6","u3","u4"]},{"id":"p3","code":"MSR-2403","name":"Water Treatment SCADA Migration","status":"In Progress","memberIds":["u2","u5","u4"]},{"id":"p4","code":"MSR-2404","name":"Logistics Hub HVAC Design","status":"In Progress","memberIds":["u6","u3"]},{"id":"p5","code":"MSR-2305","name":"Battery Storage Feasibility Study","status":"Closed","memberIds":["u2","u5"]},{"id":"p6","code":"MSR-2209","name":"Urban Footbridge Inspection","status":"Archived","memberIds":["u6","u4"]}],"tasks":[{"id":"t1","projectId":"p1","title":"Single-line diagram revision C","status":"Done","assigneeId":"u5","startDate":"2026-08-03","dueDate":"2026-08-28"},{"id":"t2","projectId":"p1","title":"Transformer foundation design","status":"Done","assigneeId":"u3","startDate":"2026-08-17","dueDate":"2026-09-18"},{"id":"t3","projectId":"p1","title":"Protection relay coordination study","status":"Review","assigneeId":"u5","startDate":"2026-09-14","dueDate":"2026-10-23"},{"id":"t4","projectId":"p1","title":"Earthing grid calculation","status":"In Progress","assigneeId":"u3","startDate":"2026-09-28","dueDate":"2026-10-30"},{"id":"t5","projectId":"p1","title":"Factory acceptance test plan","status":"In Progress","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t6","projectId":"p1","title":"Cable routing & trench layout","status":"To Do","assigneeId":"u3","startDate":"2026-10-26","dueDate":"2026-11-20"},{"id":"t7","projectId":"p1","title":"Site energisation procedure","status":"To Do","assigneeId":"u5","startDate":"2026-11-16","dueDate":"2026-12-11"},{"id":"t8","projectId":"p2","title":"Existing frame survey","status":"Done","assigneeId":"u3","startDate":"2026-07-01","dueDate":"2026-07-31"},{"id":"t9","projectId":"p2","title":"Finite element model","status":"In Progress","assigneeId":"u3","startDate":"2026-08-10","dueDate":"2026-10-30"},{"id":"t10","projectId":"p2","title":"Underpinning method statement","status":"To Do","assigneeId":"u6","startDate":"2026-11-02","dueDate":"2026-12-04"},{"id":"t11","projectId":"p2","title":"Load test procedure","status":"Review","assigneeId":"u4","startDate":"2026-09-21","dueDate":"2026-10-20"},{"id":"t12","projectId":"p3","title":"I/O list consolidation","status":"Done","assigneeId":"u5","startDate":"2026-09-07","dueDate":"2026-09-25"},{"id":"t13","projectId":"p3","title":"Redundant server configuration","status":"In Progress","assigneeId":"u5","startDate":"2026-09-28","dueDate":"2026-10-23"},{"id":"t14","projectId":"p3","title":"HMI screen migration","status":"In Progress","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t15","projectId":"p3","title":"Cutover plan — Plant B","status":"To Do","assigneeId":"u2","startDate":"2026-11-02","dueDate":"2026-11-20"},{"id":"t16","projectId":"p4","title":"Heat load calculations","status":"In Progress","assigneeId":"u3","startDate":"2026-09-21","dueDate":"2026-10-30"},{"id":"t17","projectId":"p4","title":"Ductwork concept layout","status":"To Do","assigneeId":"u3","startDate":"2026-11-02","dueDate":"2026-12-18"},{"id":"t18","projectId":"p5","title":"Final feasibility report","status":"Done","assigneeId":"u2","startDate":"2026-05-04","dueDate":"2026-06-26"},{"id":"t19","projectId":"p6","title":"Inspection report","status":"Done","assigneeId":"u4","startDate":"2025-12-01","dueDate":"2026-02-20"}]};
+    const TODAY = '2026-10-16';
+    const BASE = Date.UTC(2026, 0, 1);
+    const DAYMS = 86400000;
+    // un « demi-jour » = un entier : 2 × nombre de jours depuis le 1er janvier 2026 (+1 pour l'après-midi)
+    const idx = (date, half) => Math.round((Date.parse(date + 'T00:00:00Z') - BASE) / DAYMS) * 2 + (half === 'PM' ? 1 : 0);
+    const dateOf = (i) => new Date(BASE + Math.floor(i / 2) * DAYMS).toISOString().slice(0, 10);
+    const halfOf = (i) => (i % 2 ? 'PM' : 'AM');
+    const addDays = (date, n) => new Date(Date.parse(date + 'T00:00:00Z') + n * DAYMS).toISOString().slice(0, 10);
+    const dow = (date) => new Date(date + 'T00:00:00Z').getUTCDay();          // 0 = dimanche
+    const isWeekendIdx = (i) => [0, 6].includes(dow(dateOf(i)));
+    const mondayOf = (date) => addDays(date, -((dow(date) + 6) % 7));
+    const fmt = (date, f = 'ddd D MMM') => moment(date).format(f);
+    moment.updateLocale('en', { monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sept_Oct_Nov_Dec'.split('_') });
+    const PROJECT_COLORS = ['var(--primary)', 'var(--success)', 'var(--chart-5)', 'oklch(.62 .14 70)', '#4f4c4d', 'var(--muted-foreground)'];
+    const LEAVE_BG = 'repeating-linear-gradient(135deg, color-mix(in oklch, var(--muted-foreground) 45%, transparent) 0 5px, color-mix(in oklch, var(--muted-foreground) 20%, transparent) 5px 10px)';
+
+    // ---------------------------------------------------------------- planning d'exemple
+    function seedSlots() {
+      let n = 0;
+      const S = (person, project, d1, h1, d2, h2, extra = {}) => ({ id: 'seed' + (++n), personId: person, kind: 'work', projectId: project, taskId: null, a: idx(d1, h1), b: idx(d2, h2), status: 'planned', ...extra });
+      const L = (person, d1, h1, d2, h2, label) => ({ id: 'seed' + (++n), personId: person, kind: 'leave', label, projectId: null, taskId: null, a: idx(d1, h1), b: idx(d2, h2), status: 'planned' });
+      return [
+        // Sophie (manager)
+        S('u2', 'p1', '2026-10-12', 'AM', '2026-10-14', 'PM'), S('u2', 'p3', '2026-10-15', 'AM', '2026-10-15', 'PM'),
+        S('u2', 'p1', '2026-10-16', 'AM', '2026-10-16', 'AM'), S('u2', 'p3', '2026-10-16', 'PM', '2026-10-16', 'PM'),
+        S('u2', 'p1', '2026-10-19', 'AM', '2026-10-19', 'PM'), S('u2', 'p3', '2026-10-20', 'AM', '2026-10-22', 'PM'),
+        S('u2', 'p1', '2026-10-23', 'AM', '2026-10-23', 'PM'), S('u2', 'p1', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u2', 'p3', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        // Julien : un double-réservation volontaire le jeudi 15 après-midi (MSR-2404 et MSR-2401)
+        S('u3', 'p2', '2026-10-12', 'AM', '2026-10-13', 'PM'), S('u3', 'p1', '2026-10-14', 'AM', '2026-10-14', 'PM', { taskId: 't3' }),
+        S('u3', 'p4', '2026-10-15', 'AM', '2026-10-16', 'PM'), S('u3', 'p1', '2026-10-15', 'PM', '2026-10-15', 'PM'),
+        S('u3', 'p2', '2026-10-19', 'AM', '2026-10-21', 'PM'), S('u3', 'p4', '2026-10-22', 'AM', '2026-10-23', 'PM'),
+        S('u3', 'p1', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u3', 'p2', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        // Amina : demi-journées partagées + congé
+        S('u4', 'p3', '2026-10-12', 'AM', '2026-10-12', 'PM'), S('u4', 'p2', '2026-10-13', 'AM', '2026-10-14', 'PM'),
+        S('u4', 'p1', '2026-10-15', 'AM', '2026-10-15', 'PM'), S('u4', 'p2', '2026-10-16', 'AM', '2026-10-16', 'AM'), S('u4', 'p1', '2026-10-16', 'PM', '2026-10-16', 'PM'),
+        S('u4', 'p1', '2026-10-19', 'AM', '2026-10-19', 'PM'), L('u4', '2026-10-20', 'PM', '2026-10-21', 'PM', 'Annual leave'),
+        S('u4', 'p3', '2026-10-22', 'AM', '2026-10-23', 'PM'), S('u4', 'p2', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u4', 'p1', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        // Lucas : le vendredi 16 après-midi reste libre
+        S('u5', 'p1', '2026-10-12', 'AM', '2026-10-14', 'PM'), S('u5', 'p3', '2026-10-15', 'AM', '2026-10-15', 'PM'), S('u5', 'p1', '2026-10-16', 'AM', '2026-10-16', 'AM'),
+        S('u5', 'p1', '2026-10-19', 'AM', '2026-10-21', 'PM'), S('u5', 'p3', '2026-10-22', 'AM', '2026-10-23', 'PM'),
+        S('u5', 'p1', '2026-10-26', 'AM', '2026-10-28', 'PM'), S('u5', 'p3', '2026-10-29', 'AM', '2026-10-30', 'PM'),
+        // Nora (manager)
+        S('u6', 'p2', '2026-10-12', 'AM', '2026-10-13', 'PM'), S('u6', 'p4', '2026-10-14', 'AM', '2026-10-16', 'PM'),
+        S('u6', 'p2', '2026-10-19', 'AM', '2026-10-20', 'PM'), S('u6', 'p4', '2026-10-21', 'AM', '2026-10-23', 'PM'),
+        S('u6', 'p2', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u6', 'p4', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+      ];
+    }
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('plan', () => ({
+        ...DATA,
+        TODAY,
+        // ---- réglages de la maquette (chaque réglage correspond à une question à trancher)
+        PERSONAS: [{ id: 'admin', label: 'Admin · Karim', user: 'u1' }, { id: 'manager', label: 'Manager · Sophie', user: 'u2' }, { id: 'manager2', label: 'Manager · Nora', user: 'u6' }, { id: 'collab', label: 'Collaborator · Julien', user: 'u3' }],
+        persona: 'manager',
+        view: 'half',                 // half = grille demi-journées · timeline = vue projets (existante, agrégée)
+        zoom: '1w', weekStart: '2026-10-12', hideWeekends: false,
+        filter: 'active',
+        source: 'planned',            // planned = créneaux saisis · both = + estimation d'après les tâches
+        allowShare: false,            // une demi-journée peut-elle être partagée entre deux projets ?
+        selfPlan: 'free',             // no = seul le manager planifie · free = le collaborateur planifie seul · validate = il propose, le manager valide
+        slots: seedSlots(),
+        sel: { rowId: null, a: null, b: null, active: false },
+        dlg: { open: false, mode: 'new', id: null, personId: '', kind: 'work', projectId: '', taskId: '', d1: '', h1: 'AM', d2: '', h2: 'PM' },
+        showConflicts: false, showNotes: true,
+
+        // ---------------------------------------------------------------- personnes visibles et droits d'édition
+        get user() { return this.members.find((m) => m.id === this.PERSONAS.find((p) => p.id === this.persona).user); },
+        subs(id) {
+          const out = [], seen = new Set([id]), q = [id];
+          while (q.length) { const x = q.shift(); this.members.forEach((m) => { if (m.supervisorId === x && !seen.has(m.id)) { seen.add(m.id); out.push(m); q.push(m.id); } }); }
+          return out;
+        },
+        get staff() {
+          if (this.persona === 'admin') return this.members.filter((m) => m.role !== 'Client');
+          if (this.persona === 'collab') return [this.user];
+          return [this.user, ...this.subs(this.user.id)];
+        },
+        canEdit(personId) {
+          if (this.persona !== 'collab') return this.staff.some((m) => m.id === personId);
+          return this.selfPlan !== 'no' && personId === this.user.id;
+        },
+        get activeProjects() { return this.projects.filter((p) => p.status === 'In Progress'); },
+        project(id) { return this.projects.find((p) => p.id === id); },
+        member(id) { return this.members.find((m) => m.id === id); },
+        colorOf(pid) { return PROJECT_COLORS[Math.max(0, this.projects.findIndex((p) => p.id === pid)) % PROJECT_COLORS.length]; },
+        avatarColor(id) { return ['bg-primary text-primary-foreground', 'bg-success text-success-foreground', 'bg-chart-5 text-primary-foreground', 'bg-[oklch(.62_.14_70)] text-white', 'bg-[#4f4c4d] text-white'][id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 5]; },
+        pass(s) { return s.kind === 'leave' || this.filter === 'all' || (this.filter === 'active' ? this.project(s.projectId)?.status === 'In Progress' : s.projectId === this.filter); },
+        get filterOptions() { return [{ v: 'active', l: 'Active projects' }, { v: 'all', l: 'All projects' }, ...this.projects.map((p) => ({ v: p.id, l: `${p.code} · ${p.name}` }))]; },
+
+        // ---------------------------------------------------------------- fenêtre affichée
+        get nDays() { return { '1w': 7, '2w': 14, '4w': 28 }[this.zoom]; },
+        get cellW() { return { '1w': 46, '2w': 30, '4w': 17 }[this.zoom]; },
+        get cols() {
+          const out = [];
+          for (let k = 0; k < this.nDays; k++) {
+            const date = addDays(this.weekStart, k), wk = [0, 6].includes(dow(date));
+            if (wk && this.hideWeekends) continue;
+            ['AM', 'PM'].forEach((h) => out.push({ i: idx(date, h), date, half: h, weekend: wk, today: date === TODAY }));
+          }
+          return out;
+        },
+        get days() { const m = new Map(); this.cols.forEach((c) => { if (!m.has(c.date)) m.set(c.date, { date: c.date, weekend: c.weekend, today: c.today, span: 0 }); m.get(c.date).span += 1; }); return [...m.values()]; },
+        get rangeLabel() { const c = this.cols; return fmt(c[0].date, 'D MMM') + ' – ' + fmt(c[c.length - 1].date, 'D MMM YYYY'); },
+        get nCols() { return this.cols.length; },
+        dayLabel(dy) {
+          if (this.zoom === '4w') return fmt(dy.date, 'dd').charAt(0) + ' ' + fmt(dy.date, 'D');
+          return fmt(dy.date, 'ddd D') + (fmt(dy.date, 'D') === '1' ? fmt(dy.date, ' MMM') : '');
+        },
+        shift(dir) { this.weekStart = addDays(this.weekStart, dir * this.nDays); },
+        goToday() { this.weekStart = mondayOf(TODAY); },
+        goTo(i) { this.weekStart = mondayOf(dateOf(i)); this.view = 'half'; },
+        fmtHalf(i) { return fmt(dateOf(i)) + ' ' + (halfOf(i) === 'AM' ? 'morning' : 'afternoon'); },
+        fmtShort(i) { return fmt(dateOf(i), 'ddd D') + ' ' + halfOf(i); },
+
+        // ---------------------------------------------------------------- calculs sur les créneaux
+        slotsOf(personId) { return this.slots.filter((s) => s.personId === personId); },
+        overlap(x, y) { return Math.max(0, Math.min(x.b, y.b) - Math.max(x.a, y.a) + 1); },
+        // conflits : deux projets sur la même demi-journée (si le partage est interdit) ; travail posé pendant un congé
+        flagsOf(s) {
+          const others = this.slotsOf(s.personId).filter((o) => o.id !== s.id);
+          const f = { conflict: false, leave: false, shared: false };
+          if (s.kind === 'work') {
+            others.forEach((o) => { const n = this.overlap(s, o); if (!n) return; if (o.kind === 'leave') f.leave = true; else if (this.allowShare) f.shared = true; else f.conflict = true; });
+          } else others.forEach((o) => { if (o.kind === 'work' && this.overlap(s, o)) f.leave = true; });
+          return f;
+        },
+        get conflicts() {
+          const out = [];
+          this.staff.forEach((m) => {
+            const w = this.slotsOf(m.id).filter((s) => s.kind === 'work');
+            for (let x = 0; x < w.length; x++) for (let y = x + 1; y < w.length; y++) {
+              const n = this.overlap(w[x], w[y]); if (!n) continue;
+              const a = Math.max(w[x].a, w[y].a), b = Math.min(w[x].b, w[y].b);
+              out.push({ key: w[x].id + w[y].id, person: m, a, b, n, codes: [this.project(w[x].projectId).code, this.project(w[y].projectId).code], leave: false });
+            }
+            this.slotsOf(m.id).filter((s) => s.kind === 'leave').forEach((l) => w.forEach((s) => {
+              const n = this.overlap(l, s); if (!n) return;
+              out.push({ key: l.id + s.id, person: m, a: Math.max(l.a, s.a), b: Math.min(l.b, s.b), n, codes: [this.project(s.projectId).code, 'leave'], leave: true });
+            }));
+          });
+          return this.allowShare ? out.filter((c) => c.leave) : out;
+        },
+
+        // estimation d'après les tâches : demi-journées libres comprises entre le début et l'échéance d'une tâche non terminée
+        estimate(personId, first, last, plannedSet) {
+          const byProject = {};
+          this.tasks.filter((t) => t.assigneeId === personId && t.status !== 'Done').forEach((t) => {
+            const a = Math.max(idx(t.startDate, 'AM'), first), b = Math.min(idx(t.dueDate, 'PM'), last);
+            if (a > b) return;
+            if (!byProject[t.projectId]) byProject[t.projectId] = new Set();
+            for (let i = a; i <= b; i++) byProject[t.projectId].add(i);
+          });
+          const out = [];
+          Object.entries(byProject).forEach(([pid, set]) => {
+            if (!this.pass({ kind: 'work', projectId: pid })) return;
+            const free = [...set].filter((i) => !plannedSet.has(i) && !isWeekendIdx(i)).sort((x, y) => x - y);
+            let run = null;
+            const between = (p, i) => { for (let k = p + 1; k < i; k++) if (!isWeekendIdx(k)) return false; return true; };
+            free.forEach((i) => { if (run && between(run.b, i)) run.b = i; else { if (run) out.push(run); run = { projectId: pid, a: i, b: i }; } });
+            if (run) out.push(run);
+          });
+          return out.map((e, k) => ({ id: 'est' + personId + e.projectId + e.a, personId, kind: 'est', ...e, status: 'estimated' }));
+        },
+
+        // ---------------------------------------------------------------- la grille (une seule passe de calcul)
+        get grid() {
+          const cols = this.cols, n = cols.length, first = cols[0].i, last = cols[n - 1].i, LANE = 26;
+          const pos0 = (i) => cols.findIndex((c) => c.i >= i), pos1 = (i) => { for (let k = n - 1; k >= 0; k--) if (cols[k].i <= i) return k; return -1; };
+          const rows = this.staff.map((m) => {
+            const mine = this.slotsOf(m.id).filter((s) => this.pass(s));
+            const planned = new Set();
+            this.slotsOf(m.id).filter((s) => s.kind === 'work').forEach((s) => { for (let i = s.a; i <= s.b; i++) planned.add(i); });
+            const items = [...mine, ...(this.source === 'both' ? this.estimate(m.id, first, last, planned) : [])];
+            const placed = items.map((s) => {
+              const a = pos0(s.a), b = pos1(s.b); if (a < 0 || b < 0 || a > b || s.b < first || s.a > last) return null;
+              return { s, a, b, flags: s.kind === 'est' ? {} : this.flagsOf(s) };
+            }).filter(Boolean).sort((x, y) => x.a - y.a || x.b - y.b);
+            const ends = [];
+            placed.forEach((p) => { let l = ends.findIndex((e) => e < p.a); if (l === -1) l = ends.length; ends[l] = p.b; p.lane = l; });
+            const lanes = Math.max(1, ends.length);
+            const bars = placed.map((p) => {
+              const s = p.s, proj = s.projectId ? this.project(s.projectId) : null, nHalf = s.b - s.a + 1;
+              const bg = s.kind === 'leave' ? LEAVE_BG : s.kind === 'est'
+                ? `repeating-linear-gradient(135deg, ${this.colorOf(s.projectId)} 0 4px, color-mix(in oklch, ${this.colorOf(s.projectId)} 35%, transparent) 4px 8px)`
+                : this.colorOf(s.projectId);
+              const task = s.taskId ? this.tasks.find((t) => t.id === s.taskId) : null;
+              const title = s.kind === 'leave' ? `${s.label || 'Leave'} · ${this.fmtHalf(s.a)} → ${this.fmtHalf(s.b)}`
+                : `${proj.name}${task ? ' · ' + task.title : ''} · ${this.fmtHalf(s.a)} → ${this.fmtHalf(s.b)} · ${nHalf} half-day${nHalf > 1 ? 's' : ''}${s.kind === 'est' ? ' (estimated from tasks)' : ''}${s.status === 'proposed' ? ' (proposed)' : ''}`;
+              return { key: s.id, slot: s, kind: s.kind, status: s.status, left: (p.a / n) * 100, width: ((p.b - p.a + 1) / n) * 100, top: 7 + p.lane * LANE, bg, flags: p.flags, label: s.kind === 'leave' ? (s.label || 'Leave') : proj.code, nHalf, title, wide: p.b - p.a + 1 >= 3 };
+            });
+            // charge : demi-journées travaillées / demi-journées ouvrées (hors congés) sur la fenêtre
+            let cap = 0, plannedN = 0;
+            cols.forEach((c) => { if (c.weekend) return; const onLeave = this.slotsOf(m.id).some((s) => s.kind === 'leave' && c.i >= s.a && c.i <= s.b); if (!onLeave) { cap += 1; if (planned.has(c.i)) plannedN += 1; } });
+            return { person: m, bars, lanes, height: Math.max(48, lanes * LANE + 14), cap, planned: plannedN, free: cap - plannedN, pct: cap ? Math.round((plannedN / cap) * 100) : 0, editable: this.canEdit(m.id) };
+          });
+          // couverture par demi-journée + total par projet (sur les personnes visibles)
+          const coverage = cols.map((c) => rows.filter((r) => this.slotsOf(r.person.id).some((s) => s.kind === 'work' && this.pass(s) && c.i >= s.a && c.i <= s.b)).length);
+          const proj = {};
+          rows.forEach((r) => this.slotsOf(r.person.id).filter((s) => s.kind === 'work' && this.pass(s)).forEach((s) => {
+            const a = Math.max(s.a, first), b = Math.min(s.b, last); if (a > b) return;
+            let k = 0; cols.forEach((c) => { if (c.i >= a && c.i <= b) k++; });
+            if (!k) return;
+            (proj[s.projectId] ||= { id: s.projectId, half: 0, people: new Set() }).half += k; proj[s.projectId].people.add(s.personId);
+          }));
+          const projects = Object.values(proj).map((p) => ({ ...this.project(p.id), half: p.half, people: p.people.size, color: this.colorOf(p.id) })).sort((x, y) => y.half - x.half);
+          return { rows, cols, coverage, maxCov: Math.max(1, ...coverage), projects, minWidth: 224 + n * this.cellW };
+        },
+
+        // ---------------------------------------------------------------- vue « projets » (agrégée, comme la chronologie actuelle)
+        get tl() {
+          const staffIds = new Set(this.staff.map((m) => m.id)), list = this.slots.filter((s) => staffIds.has(s.personId) && this.pass(s));
+          if (!list.length) return { rows: [], months: [] };
+          const minD = dateOf(Math.min(...list.map((s) => s.a))), maxD = dateOf(Math.max(...list.map((s) => s.b)));
+          const rs = minD.slice(0, 8) + '01', last = new Date(maxD + 'T00:00:00Z'), re = new Date(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() + 1, 1)).toISOString().slice(0, 10);
+          const span = (Date.parse(re) - Date.parse(rs)) / DAYMS, pct = (date) => ((Date.parse(date) - Date.parse(rs)) / DAYMS / span) * 100;
+          const months = []; for (let d = rs; d < re;) { const nx = new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7), 1)).toISOString().slice(0, 10); months.push({ label: fmt(d, 'MMM YY'), left: pct(d) }); d = nx; }
+          const rows = this.staff.map((m) => {
+            const by = {};
+            list.filter((s) => s.personId === m.id).forEach((s) => { const k = s.kind === 'leave' ? 'leave' : s.projectId; (by[k] ||= { k, a: s.a, b: s.b, half: 0 }); by[k].a = Math.min(by[k].a, s.a); by[k].b = Math.max(by[k].b, s.b); by[k].half += s.b - s.a + 1; });
+            const items = Object.values(by).sort((x, y) => x.a - y.a), ends = [];
+            const bars = items.map((it) => { const l = pct(dateOf(it.a)), r = pct(addDays(dateOf(it.b), 1)); let lane = ends.findIndex((e) => e <= l); if (lane === -1) lane = ends.length; ends[lane] = r; return { ...it, left: l, width: Math.max(r - l, 1), top: 7 + lane * 26, lane, bg: it.k === 'leave' ? LEAVE_BG : this.colorOf(it.k), label: it.k === 'leave' ? 'Leave' : this.project(it.k).code, title: `${it.k === 'leave' ? 'Leave' : this.project(it.k).name} · ${fmt(dateOf(it.a))} → ${fmt(dateOf(it.b))} · ${it.half} half-days` }; });
+            return { person: m, bars, height: Math.max(48, ends.length * 26 + 14) };
+          });
+          return { rows, months, todayPct: pct(TODAY), minWidth: Math.max(720, Math.round(span * 7)) };
+        },
+
+        // ---------------------------------------------------------------- sélection à la souris (glisser sur une ligne) et dialogue
+        startSel(row, pos) { if (!row.editable) return; this.sel = { rowId: row.person.id, a: pos, b: pos, active: true }; },
+        moveSel(row, pos) { if (this.sel.active && this.sel.rowId === row.person.id) this.sel.b = pos; },
+        inSel(row, pos) { return this.sel.rowId === row.person.id && pos >= Math.min(this.sel.a, this.sel.b) && pos <= Math.max(this.sel.a, this.sel.b); },
+        endSel() {
+          if (!this.sel.active) return;
+          const c = this.cols, a = c[Math.min(this.sel.a, this.sel.b)].i, b = c[Math.max(this.sel.a, this.sel.b)].i, who = this.sel.rowId;
+          this.sel = { rowId: null, a: null, b: null, active: false };
+          this.openNew(who, a, b);
+        },
+        memberProjects(personId) { return this.activeProjects.filter((p) => p.memberIds.includes(personId)); },
+        get dlgTasks() { return this.tasks.filter((t) => t.assigneeId === this.dlg.personId && t.projectId === this.dlg.projectId && t.status !== 'Done'); },
+        get dlgA() { return idx(this.dlg.d1, this.dlg.h1); },
+        get dlgB() { return idx(this.dlg.d2, this.dlg.h2); },
+        get dlgValid() { return this.dlg.d1 && this.dlg.d2 && this.dlgB >= this.dlgA && (this.dlg.kind === 'leave' || this.dlg.projectId); },
+        get dlgCount() { return this.dlgValid ? this.dlgB - this.dlgA + 1 : 0; },
+        get dlgWarnings() {
+          if (!this.dlgValid) return [];
+          const me = { id: this.dlg.id, personId: this.dlg.personId, kind: this.dlg.kind, a: this.dlgA, b: this.dlgB }, w = [];
+          const others = this.slotsOf(me.personId).filter((o) => o.id !== me.id);
+          let weekend = 0; for (let i = me.a; i <= me.b; i++) if (isWeekendIdx(i)) weekend++;
+          if (me.kind === 'work') {
+            const ovWork = others.filter((o) => o.kind === 'work').reduce((s, o) => s + this.overlap(me, o), 0), ovLeave = others.filter((o) => o.kind === 'leave').reduce((s, o) => s + this.overlap(me, o), 0);
+            if (ovWork) w.push({ tone: this.allowShare ? 'info' : 'error', text: this.allowShare ? `${ovWork} half-day${ovWork > 1 ? 's are' : ' is'} shared with another project.` : `Conflict: ${ovWork} half-day${ovWork > 1 ? 's are' : ' is'} already planned on another project.` });
+            if (ovLeave) w.push({ tone: 'error', text: `${ovLeave} half-day${ovLeave > 1 ? 's fall' : ' falls'} during leave.` });
+          } else {
+            const ov = others.filter((o) => o.kind === 'work').reduce((s, o) => s + this.overlap(me, o), 0);
+            if (ov) w.push({ tone: 'error', text: `This leave overlaps ${ov} planned half-day${ov > 1 ? 's' : ''}.` });
+          }
+          if (weekend) w.push({ tone: 'warn', text: `${weekend} half-day${weekend > 1 ? 's fall' : ' falls'} on a non-working day.` });
+          return w;
+        },
+        openNew(personId, a, b) {
+          const mp = this.memberProjects(personId);
+          this.dlg = { open: true, mode: 'new', id: null, personId, kind: 'work', projectId: mp[0]?.id ?? '', taskId: '', d1: dateOf(a), h1: halfOf(a), d2: dateOf(b), h2: halfOf(b) };
+        },
+        openEdit(slot) {
+          if (!this.canEdit(slot.personId)) return;
+          this.dlg = { open: true, mode: 'edit', id: slot.id, personId: slot.personId, kind: slot.kind, projectId: slot.projectId ?? '', taskId: slot.taskId ?? '', d1: dateOf(slot.a), h1: halfOf(slot.a), d2: dateOf(slot.b), h2: halfOf(slot.b), label: slot.label };
+        },
+        get dlgStatus() { return this.dlg.mode === 'edit' ? this.slots.find((s) => s.id === this.dlg.id)?.status : null; },
+        get proposing() { return this.persona === 'collab' && this.selfPlan === 'validate'; },
+        save() {
+          if (!this.dlgValid) return;
+          const d = this.dlg, base = { personId: d.personId, kind: d.kind, projectId: d.kind === 'work' ? d.projectId : null, taskId: d.kind === 'work' ? (d.taskId || null) : null, label: d.kind === 'leave' ? (d.label || 'Annual leave') : undefined, a: this.dlgA, b: this.dlgB };
+          const status = this.proposing ? 'proposed' : 'planned';
+          if (d.mode === 'edit') this.slots = this.slots.map((s) => (s.id === d.id ? { ...s, ...base, status } : s));
+          else this.slots = [...this.slots, { id: 'u' + Date.now() + Math.floor(Math.random() * 999), ...base, status }];
+          this.dlg.open = false;
+        },
+        approve() { this.slots = this.slots.map((s) => (s.id === this.dlg.id ? { ...s, status: 'planned' } : s)); this.dlg.open = false; },
+        remove() { this.slots = this.slots.filter((s) => s.id !== this.dlg.id); this.dlg.open = false; },
+        reset() { this.slots = seedSlots(); this.weekStart = mondayOf(TODAY); },
+        get proposedCount() { return this.slots.filter((s) => s.status === 'proposed').length; },
+      }));
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="plan" @mouseup.window="endSel()" @keydown.escape.window="dlg.open = false">
+
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></symbol>
+    <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-chart-gantt" viewBox="0 0 24 24"><path d="M10 6h8"/><path d="M12 16h6"/><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 11h7"/></symbol>
+    <symbol id="i-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
+  </svg>
+
+  <div hidden aria-hidden="true" class="!bg-primary/20 hover:bg-primary/5 cursor-crosshair opacity-90 opacity-80 outline-2 outline-dashed outline-foreground/70 !ring-2 !ring-destructive border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 text-destructive-ink text-warning-ink text-success-ink bg-success bg-primary bg-destructive bg-muted/60 bg-destructive/5 border-border/60 border-dashed"></div>
+
+  <!-- Bandeau prototype -->
+  <div class="border-b bg-warning/15 px-4 py-2 text-center text-xs text-warning-ink">
+    <strong>Concept A · Bars grid</strong> — planning à la demi-journée. Fichier isolé : il n'est relié à aucune page du projet et ses données ne sont pas enregistrées. Essayez : glisser sur une ligne pour planifier, cliquer une barre pour la modifier, changer de profil et les réglages à droite.
+  </div>
+
+  <header class="flex h-14 items-center gap-3 border-b bg-card px-4 md:px-6">
+    <a href="planning-visuels-index.html" class="btn btn-text btn-sm -ml-2"><svg class="i"><use href="#i-arrow-left"/></svg>All concepts</a>
+    <span class="hidden h-5 w-px bg-border sm:block"></span>
+    <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">M</span>
+    <span class="flex flex-col leading-none"><span class="text-sm font-semibold tracking-tight">Maser</span><span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">Engineering</span></span>
+    <span class="ml-3 hidden text-sm text-muted-foreground sm:inline">/ Team Schedule / <span class="font-medium text-foreground">Half-day planning</span></span>
+    <div class="ml-auto flex items-center gap-2">
+      <span class="hidden text-xs text-muted-foreground md:inline">View as</span>
+      <select x-model="persona" aria-label="View as" class="select h-8 w-auto min-w-48"><template x-for="p in PERSONAS" :key="p.id"><option :value="p.id" x-text="p.label"></option></template></select>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1600px] px-4 py-6 md:px-8">
+    <div class="mb-5 flex flex-col gap-1">
+      <h1 class="text-2xl font-semibold tracking-tight">Team Schedule</h1>
+      <p class="max-w-3xl text-sm text-muted-foreground" x-text="persona === 'admin' ? 'Who works on which project, half a day at a time — everyone, as an administrator.' : persona !== 'collab' ? 'Who works on which project, half a day at a time — you and the people reporting to you.' : 'My Schedule: your own half-days by project. Your agenda (tasks and meetings) would appear below.'"></p>
+    </div>
+
+    <!-- Barre d'outils -->
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+      <div role="group" aria-label="Schedule view" class="inline-flex h-8 items-center rounded-lg border bg-card p-0.5">
+        <button type="button" :aria-pressed="view === 'timeline'" @click="view = 'timeline'" class="inline-flex h-full items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none" :class="view === 'timeline' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"><svg class="i size-4"><use href="#i-chart-gantt"/></svg>Projects</button>
+        <button type="button" :aria-pressed="view === 'half'" @click="view = 'half'" class="inline-flex h-full items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none" :class="view === 'half' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"><svg class="i size-4"><use href="#i-layout-grid"/></svg>Half-days</button>
+      </div>
+
+      <template x-if="view === 'half'">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="inline-flex items-center gap-1">
+            <button type="button" class="btn btn-outline btn-square" aria-label="Previous" @click="shift(-1)"><svg class="i"><use href="#i-chevron-left"/></svg></button>
+            <button type="button" class="btn btn-outline" @click="goToday()">Today</button>
+            <button type="button" class="btn btn-outline btn-square" aria-label="Next" @click="shift(1)"><svg class="i"><use href="#i-chevron-right"/></svg></button>
+          </div>
+          <span class="min-w-40 px-1 text-sm font-medium" x-text="rangeLabel"></span>
+          <div role="radiogroup" aria-label="Zoom" class="inline-flex rounded-lg border bg-card p-0.5"><template x-for="o in [{v:'1w',l:'1 week'},{v:'2w',l:'2 weeks'},{v:'4w',l:'4 weeks'}]" :key="o.v"><button type="button" role="radio" :aria-checked="zoom === o.v" @click="zoom = o.v" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="zoom === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template></div>
+        </div>
+      </template>
+
+      <select x-model="filter" aria-label="Filter by project" class="select h-8 w-60"><template x-for="o in filterOptions" :key="o.v"><option :value="o.v" x-text="o.l"></option></template></select>
+      <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-muted-foreground select-none" x-show="view === 'half'"><button type="button" role="switch" :aria-checked="!!(hideWeekends)" aria-label="Hide weekends" @click="hideWeekends = !hideWeekends" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50" :class="hideWeekends ? 'bg-primary' : 'bg-muted-foreground/35'"><span aria-hidden="true" class="pointer-events-none block size-4 rounded-full bg-white shadow-sm transition-transform" :class="hideWeekends ? 'translate-x-[18px]' : 'translate-x-0.5'"></span></button>Hide weekends</label>
+
+      <button type="button" class="btn ml-auto" :class="conflicts.length ? 'border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20' : 'btn-outline'" @click="showConflicts = !showConflicts" :aria-expanded="showConflicts">
+        <svg class="i"><use href="#i-triangle-alert"/></svg><span x-text="conflicts.length ? conflicts.length + (conflicts.length > 1 ? ' conflicts' : ' conflict') : 'No conflict'"></span>
+      </button>
+      <button type="button" class="btn btn-text" @click="reset()"><svg class="i"><use href="#i-rotate-ccw"/></svg>Reset sample</button>
+    </div>
+
+    <!-- Liste des conflits -->
+    <div x-show="showConflicts" x-cloak class="mb-4 card gap-0 p-0">
+      <p x-show="conflicts.length === 0" class="px-4 py-3 text-sm text-muted-foreground">Nothing to flag: no half-day is planned twice and nobody is planned during leave.</p>
+      <template x-for="c in conflicts" :key="c.key">
+        <div class="flex items-center gap-3 border-b px-4 py-2.5 text-sm last:border-b-0">
+          <svg class="i size-4 shrink-0 text-destructive"><use href="#i-triangle-alert"/></svg>
+          <p class="min-w-0 flex-1"><span class="font-medium" x-text="c.person.name"></span> —
+            <span x-text="c.leave ? 'planned on ' + c.codes[0] + ' during leave' : c.codes[0] + ' and ' + c.codes[1] + ' on the same half-day' + (c.n > 1 ? 's' : '')"></span>
+            <span class="text-muted-foreground" x-text="'· ' + fmtShort(c.a) + (c.a === c.b ? '' : ' → ' + fmtShort(c.b))"></span></p>
+          <button type="button" class="btn btn-outline btn-sm" @click="goTo(c.a); showConflicts = false">Show</button>
+        </div>
+      </template>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div class="min-w-0">
+
+        <!-- ================= Vue demi-journées ================= -->
+        <div x-show="view === 'half'" class="card gap-0 overflow-hidden p-0 select-none">
+          <div class="overflow-x-auto">
+            <div :style="`min-width: ${grid.minWidth}px`">
+              <!-- en-tête : jours puis AM / PM -->
+              <div class="flex border-b bg-muted/40">
+                <div class="sticky left-0 z-20 flex w-56 shrink-0 items-end border-r bg-muted px-4 pb-2 text-xs font-medium text-muted-foreground">Team member</div>
+                <div class="flex-1">
+                  <div class="flex border-b">
+                    <template x-for="dy in days" :key="dy.date">
+                      <div class="border-l px-1 py-1.5 text-center text-xs font-medium first:border-l-0" :class="dy.today ? 'bg-destructive/10 text-destructive' : dy.weekend ? 'text-muted-foreground' : ''" :style="`width: ${dy.span / nCols * 100}%`">
+                        <span x-text="dayLabel(dy)"></span>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="flex">
+                    <template x-for="c in grid.cols" :key="c.i">
+                      <div class="border-l py-0.5 text-center font-mono text-[9px] text-muted-foreground" :class="[c.half === 'AM' ? 'border-border' : 'border-dashed border-border/60', c.today ? 'bg-destructive/5' : '']" :style="`width: ${100 / nCols}%`" x-text="zoom === '4w' ? '' : c.half"></div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- lignes : une par personne -->
+              <template x-for="row in grid.rows" :key="row.person.id">
+                <div class="flex border-b last:border-b-0">
+                  <div class="sticky left-0 z-10 flex w-56 shrink-0 items-center gap-3 border-r bg-card px-4 py-2">
+                    <span class="relative flex size-8 shrink-0 rounded-full"><span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="avatarColor(row.person.id)" x-text="row.person.initials"></span></span>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-medium" x-text="row.person.name"></p>
+                      <p class="truncate text-[11px] text-muted-foreground" x-text="row.person.title"></p>
+                      <div class="mt-1 flex items-center gap-1.5" :title="row.planned + ' of ' + row.cap + ' working half-days planned'">
+                        <div class="h-1 w-16 overflow-hidden rounded-full bg-muted"><div class="h-full rounded-full" :class="row.pct > 100 ? 'bg-destructive' : row.pct >= 90 ? 'bg-success' : 'bg-primary'" :style="`width: ${Math.min(row.pct, 100)}%`"></div></div>
+                        <span class="font-mono text-[10px] text-muted-foreground" x-text="row.planned + '/' + row.cap"></span>
+                        <span class="text-[10px] font-medium" :class="row.free > 0 ? 'text-success-ink' : 'text-muted-foreground'" x-text="row.free > 0 ? row.free + ' free' : 'full'"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="relative flex-1" :style="`height: ${row.height}px`">
+                    <!-- cellules : fond, week-ends, aujourd'hui, sélection -->
+                    <div class="absolute inset-0 flex">
+                      <template x-for="(c, p) in grid.cols" :key="c.i">
+                        <div @mousedown.prevent="startSel(row, p)" @mouseenter="moveSel(row, p)"
+                             class="border-l" :style="`width: ${100 / nCols}%`"
+                             :class="[c.half === 'AM' ? 'border-border' : 'border-dashed border-border/60', c.weekend ? 'bg-muted/60' : '', c.today ? 'bg-destructive/5' : '', inSel(row, p) ? '!bg-primary/20' : '', row.editable && !c.weekend ? 'cursor-crosshair hover:bg-primary/5' : '']"></div>
+                      </template>
+                    </div>
+                    <span x-show="row.bars.length === 0" class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs text-muted-foreground">Nothing planned in this window<template x-if="row.editable"><span>&nbsp;— drag here to plan</span></template></span>
+                    <!-- barres -->
+                    <template x-for="b in row.bars" :key="b.key">
+                      <button type="button" @mousedown.stop @click.stop="b.kind !== 'est' && openEdit(b.slot)" :title="b.title" :aria-label="b.title"
+                              class="absolute z-[2] flex h-[22px] items-center gap-1 overflow-hidden rounded-md px-1.5 text-left font-mono text-[10px] font-semibold text-white ring-1 ring-foreground/10 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              :class="[b.kind === 'est' ? 'opacity-90' : '', b.status === 'proposed' ? 'outline-2 outline-dashed outline-foreground/70 opacity-80' : '', b.flags.conflict || b.flags.leave ? '!ring-2 !ring-destructive' : '', row.editable && b.kind !== 'est' ? 'cursor-pointer' : 'cursor-default']"
+                              :style="`left: calc(${b.left}% + 1px); width: calc(${b.width}% - 2px); top: ${b.top}px; background: ${b.bg}; text-shadow: 0 0 3px rgb(0 0 0 / 0.5)`">
+                        <svg x-show="b.flags.conflict || b.flags.leave" class="i size-3 shrink-0"><use href="#i-triangle-alert"/></svg>
+                        <span class="truncate" x-text="zoom === '4w' && b.nHalf < 3 ? '' : b.label"></span>
+                        <span x-show="b.status === 'proposed' && b.wide" class="ml-auto shrink-0 rounded bg-black/30 px-1 text-[9px] font-medium">Proposed</span>
+                        <span x-show="b.kind === 'est' && b.wide" class="ml-auto shrink-0 rounded bg-black/30 px-1 text-[9px] font-medium">Est.</span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <!-- couverture par demi-journée -->
+              <div class="flex border-t bg-muted/30">
+                <div class="sticky left-0 z-10 flex w-56 shrink-0 items-center border-r bg-muted px-4 py-1.5 text-[11px] font-medium text-muted-foreground">People planned</div>
+                <div class="flex flex-1">
+                  <template x-for="(c, p) in grid.cols" :key="c.i">
+                    <div class="border-l py-1 text-center font-mono text-[10px]" :class="c.half === 'AM' ? 'border-border' : 'border-dashed border-border/60'" :style="`width: ${100 / nCols}%; background: color-mix(in oklch, var(--primary) ${Math.round(grid.coverage[p] / grid.maxCov * 22)}%, transparent)`" x-text="zoom === '4w' ? '' : (c.weekend ? '' : grid.coverage[p])"></div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t px-4 py-2.5 text-xs text-muted-foreground">
+            <span class="inline-flex items-center gap-1.5"><span class="h-3 w-0.5 bg-destructive"></span> Today</span>
+            <template x-for="p in grid.projects" :key="p.id"><span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" :style="`background: ${p.color}`"></span><span x-text="p.code"></span></span></template>
+            <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" :style="`background: ${LEAVE_BG}`"></span> Leave</span>
+            <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm bg-muted-foreground/30 ring-1 ring-border"></span> Non-working day</span>
+            <span class="inline-flex items-center gap-1.5"><svg class="i size-3 text-destructive"><use href="#i-triangle-alert"/></svg> Conflict</span>
+            <span x-show="source === 'both'" class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background: repeating-linear-gradient(135deg, var(--primary) 0 3px, transparent 3px 6px)"></span> Estimated from tasks</span>
+          </div>
+        </div>
+
+        <!-- ================= Vue projets (agrégée) ================= -->
+        <div x-show="view === 'timeline'" x-cloak class="card gap-0 overflow-hidden p-0">
+          <div class="overflow-x-auto">
+            <div :style="`min-width: ${(tl.minWidth || 720) + 224}px`">
+              <div class="flex border-b bg-muted/40">
+                <div class="sticky left-0 z-10 w-56 shrink-0 border-r bg-muted px-4 py-2.5 text-xs font-medium text-muted-foreground">Team member</div>
+                <div class="relative h-10 flex-1"><template x-for="m in tl.months" :key="m.label"><div class="absolute inset-y-0 flex items-center border-l px-2 font-mono text-xs text-muted-foreground" :style="`left: ${m.left}%`" x-text="m.label"></div></template></div>
+              </div>
+              <template x-for="r in tl.rows" :key="r.person.id">
+                <div class="flex border-b last:border-b-0">
+                  <div class="sticky left-0 z-10 flex w-56 shrink-0 items-center gap-3 border-r bg-card px-4 py-2">
+                    <span class="relative flex size-8 shrink-0 rounded-full"><span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="avatarColor(r.person.id)" x-text="r.person.initials"></span></span>
+                    <div class="min-w-0"><p class="truncate text-sm font-medium" x-text="r.person.name"></p><p class="truncate text-[11px] text-muted-foreground" x-text="r.person.title"></p></div>
+                  </div>
+                  <div class="relative flex-1" :style="`height: ${r.height}px`">
+                    <template x-for="m in tl.months" :key="m.label"><div aria-hidden="true" class="absolute inset-y-0 border-l border-dashed border-border/70" :style="`left: ${m.left}%`"></div></template>
+                    <div aria-hidden="true" class="absolute inset-y-0 z-[1] w-0.5 bg-destructive/70" :style="`left: ${tl.todayPct}%`"></div>
+                    <span x-show="r.bars.length === 0" class="absolute inset-y-0 left-3 flex items-center text-xs text-muted-foreground">No assignment</span>
+                    <template x-for="b in r.bars" :key="b.k">
+                      <button type="button" @click="goTo(b.a)" :title="b.title + ' — click to open the half-day view'" class="absolute z-[2] flex h-[22px] cursor-pointer items-center gap-1.5 overflow-hidden rounded-md px-2 font-mono text-[10px] font-semibold text-white ring-1 ring-foreground/10 outline-none focus-visible:ring-2 focus-visible:ring-ring" :style="`left: ${b.left}%; width: ${b.width}%; top: ${b.top}px; background: ${b.bg}; text-shadow: 0 0 3px rgb(0 0 0 / 0.5)`">
+                        <span class="truncate" x-text="b.label"></span><span class="ml-auto shrink-0 rounded bg-black/30 px-1 text-[9px] font-medium" x-text="b.half + ' ½d'"></span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <p class="border-t px-4 py-2.5 text-xs text-muted-foreground">The current project-level timeline stays the overview. Click a bar to zoom into the half-day grid at that date.</p>
+        </div>
+
+        <!-- Aide à la saisie -->
+        <p x-show="view === 'half'" class="mt-3 flex items-start gap-2 text-xs text-muted-foreground"><svg class="i mt-0.5 size-3.5 shrink-0"><use href="#i-info"/></svg><span>
+          <template x-if="persona === 'collab' && selfPlan === 'no'"><span>You cannot edit your planning: only your manager plans. (Setting “Who plans” on the right.)</span></template>
+          <template x-if="!(persona === 'collab' && selfPlan === 'no')"><span>Drag across half-days on a row to plan work or leave; click a bar to edit it. A half-day is the smallest unit: <strong>AM</strong> = morning, <strong>PM</strong> = afternoon.</span></template>
+        </span></p>
+      </div>
+
+      <!-- ================= Colonne de droite ================= -->
+      <aside class="flex flex-col gap-4">
+        <div class="card gap-0 p-0">
+          <h2 class="border-b px-4 py-3 text-sm font-semibold">Half-days per project <span class="font-normal text-muted-foreground" x-text="view === 'half' ? '· this window' : ''"></span></h2>
+          <p x-show="view === 'timeline'" class="px-4 py-3 text-xs text-muted-foreground">Switch to the Half-days view to see totals for the displayed weeks.</p>
+          <ul x-show="view === 'half'" class="divide-y">
+            <template x-for="p in grid.projects" :key="p.id">
+              <li class="flex items-center gap-3 px-4 py-2.5 text-sm">
+                <span class="size-2.5 shrink-0 rounded-sm" :style="`background: ${p.color}`"></span>
+                <span class="min-w-0 flex-1"><span class="block truncate font-medium" x-text="p.name"></span><span class="font-mono text-[11px] text-muted-foreground" x-text="p.code + ' · ' + p.people + ' ' + (p.people > 1 ? 'people' : 'person')"></span></span>
+                <span class="text-right"><span class="block font-mono text-sm font-semibold tabular-nums" x-text="p.half"></span><span class="text-[10px] text-muted-foreground" x-text="'half-days · ' + (p.half / 2) + ' d'"></span></span>
+              </li>
+            </template>
+            <li x-show="grid.projects.length === 0" class="px-4 py-3 text-xs text-muted-foreground">No work planned in this window.</li>
+          </ul>
+        </div>
+
+        <div class="card gap-0 p-0" x-show="showNotes">
+          <div class="flex items-center justify-between border-b px-4 py-3"><h2 class="text-sm font-semibold">Open questions, try them here</h2><button type="button" class="grid size-6 cursor-pointer place-items-center rounded-md hover:bg-muted" aria-label="Hide" @click="showNotes = false"><svg class="i size-4"><use href="#i-x"/></svg></button></div>
+          <div class="flex flex-col divide-y text-sm">
+            <div class="flex flex-col gap-2 px-4 py-3">
+              <p class="font-medium">1 · Source of truth</p>
+              <div role="radiogroup" aria-label="Source" class="inline-flex rounded-lg border bg-card p-0.5"><template x-for="o in [{v:'planned',l:'Planned slots'},{v:'both',l:'+ Estimate from tasks'}]" :key="o.v"><button type="button" role="radio" :aria-checked="source === o.v" @click="source = o.v" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="source === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template></div>
+              <p class="text-xs text-muted-foreground">Slots are entered by hand. The estimate fills free half-days between a task's start and due dates (hatched) to suggest what is likely.</p>
+            </div>
+            <div class="flex flex-col gap-2 px-4 py-3">
+              <p class="font-medium">2 · Who plans</p>
+              <div role="radiogroup" aria-label="Who plans" class="inline-flex rounded-lg border bg-card p-0.5"><template x-for="o in [{v:'no',l:'Manager only'},{v:'free',l:'Self-planning'},{v:'validate',l:'Propose → validate'}]" :key="o.v"><button type="button" role="radio" :aria-checked="selfPlan === o.v" @click="selfPlan = o.v" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="selfPlan === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template></div>
+              <p class="text-xs text-muted-foreground">Managers always plan for their team. Switch “View as” to <em>Collaborator · Julien</em> to try the three cases, then to <em>Manager · Nora</em> (his manager) to validate. With validation, a collaborator's slots are dashed (“Proposed”) until a manager approves them.
+                <span x-show="proposedCount > 0" class="font-medium text-warning-ink" x-text="'— ' + proposedCount + ' proposed slot' + (proposedCount > 1 ? 's' : '') + ' waiting'"></span></p>
+            </div>
+            <div class="flex flex-col gap-2 px-4 py-3">
+              <div class="flex items-center justify-between gap-3"><p class="font-medium">3 · Share a half-day</p><button type="button" role="switch" :aria-checked="!!(allowShare)" aria-label="Allow sharing a half-day between projects" @click="allowShare = !allowShare" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50" :class="allowShare ? 'bg-primary' : 'bg-muted-foreground/35'"><span aria-hidden="true" class="pointer-events-none block size-4 rounded-full bg-white shadow-sm transition-transform" :class="allowShare ? 'translate-x-[18px]' : 'translate-x-0.5'"></span></button></div>
+              <p class="text-xs text-muted-foreground" x-text="allowShare ? 'Allowed: two projects can overlap on the same half-day (shown on two lines, no alert).' : 'Exclusive: a half-day belongs to one project. Julien is double-booked on Thursday afternoon, see the red alert.'"></p>
+            </div>
+            <div class="flex flex-col gap-1 px-4 py-3">
+              <p class="font-medium">4 · My Schedule</p>
+              <p class="text-xs text-muted-foreground">Same grid, reduced to your own row, plus your agenda. Switch to <em>Collaborator · Julien</em> to preview it.</p>
+            </div>
+          </div>
+        </div>
+        <button x-show="!showNotes" x-cloak type="button" class="btn btn-outline self-start" @click="showNotes = true"><svg class="i"><use href="#i-sparkles"/></svg>Show the open questions</button>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ================= Dialogue « Plan work » ================= -->
+  <div x-show="dlg.open" x-cloak class="fixed inset-0 z-[60]" role="presentation">
+    <div x-show="dlg.open" x-transition.opacity.duration.100ms @click="dlg.open = false" class="fixed inset-0 bg-black/10 backdrop-blur-xs"></div>
+    <div x-show="dlg.open" x-transition.opacity.duration.120ms role="dialog" aria-modal="true" aria-labelledby="pw-title"
+         class="fixed top-1/2 left-1/2 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 sm:max-w-lg">
+      <form class="flex flex-col gap-4" @submit.prevent="save()">
+        <div class="flex flex-col gap-2">
+          <h2 id="pw-title" class="text-base leading-none font-medium" x-text="dlg.mode === 'edit' ? 'Edit planning' : 'Plan work'"></h2>
+          <p class="text-sm text-muted-foreground" x-text="member(dlg.personId)?.name + (proposing ? ' — your manager will be asked to validate this.' : '')"></p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5 sm:col-span-2">
+            <span class="label-text">Type</span>
+            <div role="radiogroup" aria-label="Type" class="inline-flex rounded-lg border bg-card p-0.5"><template x-for="o in [{v:'work',l:'Work on a project'},{v:'leave',l:'Leave / absence'}]" :key="o.v"><button type="button" role="radio" :aria-checked="dlg.kind === o.v" @click="dlg.kind = o.v" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="dlg.kind === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template></div>
+          </div>
+          <div x-show="dlg.kind === 'work'" class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="pw-project" class="label-text">Project</label>
+            <select id="pw-project" x-model="dlg.projectId" @change="dlg.taskId = ''" class="select"><template x-for="p in memberProjects(dlg.personId)" :key="p.id"><option :value="p.id" x-text="p.code + ' · ' + p.name"></option></template></select>
+          </div>
+          <div x-show="dlg.kind === 'work'" class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="pw-task" class="label-text">Task <span class="font-normal text-muted-foreground">(optional)</span></label>
+            <select id="pw-task" x-model="dlg.taskId" class="select"><option value="">— none —</option><template x-for="t in dlgTasks" :key="t.id"><option :value="t.id" x-text="t.title"></option></template></select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="pw-d1" class="label-text">From</label>
+            <div class="flex gap-2"><input id="pw-d1" type="date" x-model="dlg.d1" class="input"><select x-model="dlg.h1" aria-label="From half-day" class="select w-28"><option value="AM">Morning</option><option value="PM">Afternoon</option></select></div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="pw-d2" class="label-text">To (included)</label>
+            <div class="flex gap-2"><input id="pw-d2" type="date" x-model="dlg.d2" :min="dlg.d1" class="input"><select x-model="dlg.h2" aria-label="To half-day" class="select w-28"><option value="AM">Morning</option><option value="PM">Afternoon</option></select></div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5 rounded-lg bg-muted/60 px-3 py-2.5">
+          <p class="text-sm font-medium" x-text="dlgValid ? dlgCount + ' half-day' + (dlgCount > 1 ? 's' : '') + ' · ' + (dlgCount / 2) + ' day' + (dlgCount / 2 === 1 ? '' : 's') + ' — ' + fmtShort(dlgA) + ' → ' + fmtShort(dlgB) : 'Choose a valid period'"></p>
+          <template x-for="w in dlgWarnings" :key="w.text"><p class="flex items-start gap-1.5 text-xs" :class="w.tone === 'error' ? 'text-destructive-ink' : w.tone === 'warn' ? 'text-warning-ink' : 'text-muted-foreground'"><svg class="i mt-0.5 size-3.5 shrink-0"><use :href="w.tone === 'info' ? '#i-info' : '#i-triangle-alert'"/></svg><span x-text="w.text"></span></p></template>
+        </div>
+        <div class="-mx-4 -mb-4 flex flex-wrap items-center gap-2 rounded-b-xl border-t bg-muted/50 p-4">
+          <button x-show="dlg.mode === 'edit'" type="button" class="btn bg-destructive/10 text-destructive hover:bg-destructive/20" @click="remove()"><svg class="i"><use href="#i-trash-2"/></svg>Delete</button>
+          <div class="ml-auto flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline" @click="dlg.open = false">Cancel</button>
+            <button x-show="dlgStatus === 'proposed' && persona !== 'collab'" type="button" class="btn bg-success text-success-foreground hover:bg-success/90" @click="approve()"><svg class="i"><use href="#i-check"/></svg>Approve</button>
+            <button type="submit" class="btn btn-primary" :disabled="!dlgValid" x-text="proposing ? 'Propose' : 'Save'"></button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

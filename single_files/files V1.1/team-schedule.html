@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4f4c4d">
+  <title>Team Schedule · Maser Engineering</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e63641'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Préférences d'affichage (thème, palette, taille, position du menu) partagées entre les pages -->
+  <script>
+    try {
+      var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
+      if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
+      if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
+      if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+      if (p.navLayout && p.navLayout !== 'side') e.setAttribute('data-nav', p.navLayout);
+    } catch (_) {}
+  </script>
+
+  <!-- ===================================================================
+       1) Tokens de couleur Maser Engineering (CSS natif, clair / sombre)
+       =================================================================== -->
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f6f6f6, #1c1b1b);
+      --foreground: light-dark(#2b2929, #f6f6f6);
+      --card: light-dark(#ffffff, #272525);
+      --card-foreground: var(--foreground);
+      --popover: var(--card);
+      --popover-foreground: var(--foreground);
+      --primary: #e63641;
+      --primary-foreground: #ffffff;
+      --alt: light-dark(#4f4c4d, #b5b2b3);
+      --secondary: light-dark(#f6f6f6, #333031);
+      --secondary-foreground: var(--alt);
+      --muted: light-dark(#f6f6f6, #333031);
+      --muted-foreground: light-dark(#6f6c6d, #aaa7a8);
+      --accent: light-dark(#f6f6f6, #333031);
+      --accent-foreground: var(--foreground);
+      --success: oklch(0.6 0.13 163);
+      --success-foreground: #ffffff;
+      --warning: oklch(0.75 0.15 70);
+      --warning-foreground: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive: oklch(0.58 0.22 27);
+      --border: light-dark(#e6e5e5, #3d3a3b);
+      --input: light-dark(#e6e5e5, #3d3a3b);
+      --ring: #e63641;
+      --chart-1: #e63641;
+      --chart-2: oklch(0.6 0.13 163);
+      --chart-3: oklch(0.75 0.15 70);
+      --chart-4: oklch(0.58 0.22 27);
+      --chart-5: oklch(0.6 0.1 240);
+      /* textes de badges : teinte mélangée au texte */
+      --alt-ink: color-mix(in oklch, var(--alt) 65%, var(--foreground));
+      --success-ink: color-mix(in oklch, var(--success) 65%, var(--foreground));
+      --warning-ink: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive-ink: color-mix(in oklch, var(--destructive) 65%, var(--foreground));
+      --chart-5-ink: color-mix(in oklch, var(--chart-5) 65%, var(--foreground));
+      --muted-ink: color-mix(in oklch, var(--muted-foreground) 65%, var(--foreground));
+      --sidebar: #4f4c4d;
+      --sidebar-foreground: #f6f6f6;
+      --sidebar-primary: #e63641;
+      --sidebar-primary-foreground: #ffffff;
+      --sidebar-accent: #625f60;
+      --sidebar-accent-foreground: #ffffff;
+      --sidebar-border: #625f60;
+      --sidebar-ring: #e63641;
+      --radius: 0.5rem;
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"]  { color-scheme: dark; }
+
+    /* Palettes alternatives (Settings > Appearance) */
+    :root[data-palette="ocean"]   { --background: light-dark(#f4f6f9, #121820); --foreground: light-dark(#1b2430, #f1f5f9); --card: light-dark(#fff, #1b232d); --primary: #2f6fe4; --alt: light-dark(#475569, #cbd5e1); --secondary: light-dark(#eef1f6, #263040); --muted: light-dark(#eef1f6, #263040); --muted-foreground: light-dark(#64748b, #94a3b8); --accent: light-dark(#eef1f6, #263040); --border: light-dark(#dde3ec, #334155); --input: light-dark(#dde3ec, #334155); --ring: #2f6fe4; --chart-1: #2f6fe4; --sidebar: #1e293b; --sidebar-foreground: #e2e8f0; --sidebar-primary: #4f8df5; --sidebar-accent: #334155; --sidebar-border: #334155; --sidebar-ring: #4f8df5; }
+    :root[data-palette="forest"]  { --background: light-dark(#f5f6f3, #141a16); --foreground: light-dark(#232a25, #f3f6f3); --card: light-dark(#fff, #1e2520); --primary: #1f8a5b; --alt: light-dark(#4a5a50, #bccbc2); --secondary: light-dark(#eef1ec, #2a332d); --muted: light-dark(#eef1ec, #2a332d); --muted-foreground: light-dark(#6b7770, #9aa8a0); --accent: light-dark(#eef1ec, #2a332d); --border: light-dark(#e0e5de, #36413a); --input: light-dark(#e0e5de, #36413a); --ring: #1f8a5b; --chart-1: #1f8a5b; --sidebar: #24332b; --sidebar-foreground: #e8f0ea; --sidebar-primary: #3cb782; --sidebar-accent: #34473c; --sidebar-border: #34473c; --sidebar-ring: #3cb782; }
+    :root[data-palette="sunset"]  { --background: light-dark(#f7f5f2, #1c1916); --foreground: light-dark(#2d2825, #f7f3ee); --card: light-dark(#fff, #28231f); --primary: #d9480f; --alt: light-dark(#5c5148, #d3c8bc); --secondary: light-dark(#f1ece6, #38312a); --muted: light-dark(#f1ece6, #38312a); --muted-foreground: light-dark(#7a6f66, #b2a69a); --accent: light-dark(#f1ece6, #38312a); --border: light-dark(#e8e0d7, #4a4137); --input: light-dark(#e8e0d7, #4a4137); --ring: #d9480f; --chart-1: #d9480f; --sidebar: #3b322b; --sidebar-foreground: #f4ece3; --sidebar-primary: #f0702e; --sidebar-accent: #51463c; --sidebar-border: #51463c; --sidebar-ring: #f0702e; }
+    :root[data-palette="violet"]  { --background: light-dark(#f6f5f9, #16141c); --foreground: light-dark(#272433, #f4f2fa); --card: light-dark(#fff, #211e2b); --primary: #7c3aed; --alt: light-dark(#4f4a63, #cdc9de); --secondary: light-dark(#efedf5, #2f2b3b); --muted: light-dark(#efedf5, #2f2b3b); --muted-foreground: light-dark(#6f6a80, #a39fb5); --accent: light-dark(#efedf5, #2f2b3b); --border: light-dark(#e3e0ec, #3d3850); --input: light-dark(#e3e0ec, #3d3850); --ring: #7c3aed; --chart-1: #7c3aed; --sidebar: #2e2a40; --sidebar-foreground: #ece9f6; --sidebar-primary: #9d6bf5; --sidebar-accent: #453f5e; --sidebar-border: #453f5e; --sidebar-ring: #9d6bf5; }
+    :root[data-palette="graphite"]{ --primary: light-dark(#2b2929, #f6f6f6); --primary-foreground: light-dark(#fff, #1c1b1b); --ring: light-dark(#6f6c6d, #aaa7a8); --chart-1: light-dark(#4f4c4d, #cfcdce); --sidebar: #1c1b1b; --sidebar-foreground: #d9d8d8; --sidebar-primary: #f6f6f6; --sidebar-primary-foreground: #1c1b1b; --sidebar-accent: #333031; --sidebar-border: #333031; --sidebar-ring: #aaa7a8; }
+
+    :root[data-density="compact"] { font-size: 14.5px; }
+    :root[data-density="large"]   { font-size: 17px; }
+
+    [x-cloak] { display: none !important; }
+    /* icônes Lucide (sprite SVG) */
+    .i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- ===================================================================
+       2) Tailwind CSS (CDN) + configuration du thème
+       =================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-alt: var(--alt);
+      --color-success: var(--success);
+      --color-success-foreground: var(--success-foreground);
+      --color-warning: var(--warning);
+      --color-warning-foreground: var(--warning-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --color-chart-1: var(--chart-1);
+      --color-chart-2: var(--chart-2);
+      --color-chart-3: var(--chart-3);
+      --color-chart-4: var(--chart-4);
+      --color-chart-5: var(--chart-5);
+      --color-alt-ink: var(--alt-ink);
+      --color-success-ink: var(--success-ink);
+      --color-warning-ink: var(--warning-ink);
+      --color-destructive-ink: var(--destructive-ink);
+      --color-chart-5-ink: var(--chart-5-ink);
+      --color-muted-ink: var(--muted-ink);
+      --color-sidebar: var(--sidebar);
+      --color-sidebar-foreground: var(--sidebar-foreground);
+      --color-sidebar-primary: var(--sidebar-primary);
+      --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+      --color-sidebar-accent: var(--sidebar-accent);
+      --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+      --color-sidebar-border: var(--sidebar-border);
+      --color-sidebar-ring: var(--sidebar-ring);
+
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+      --radius-3xl: calc(var(--radius) * 2.2);
+      --radius-4xl: calc(var(--radius) * 2.6);
+
+      /* Alias des noms de couleurs FlyonUI (migration future sans retouche) */
+      --color-base-100: var(--card);
+      --color-base-200: var(--background);
+      --color-base-300: var(--border);
+      --color-base-content: var(--foreground);
+      --color-error: var(--destructive);
+      --color-info: var(--chart-5);
+    }
+
+    @layer base {
+      *, ::after, ::before { border-color: var(--border); }
+      * { outline-color: color-mix(in oklab, var(--ring) 50%, transparent); }
+      body { @apply bg-background text-foreground font-sans antialiased; }
+    }
+
+    /* ---------------------------------------------------------------
+       Classes sémantiques compatibles FlyonUI (btn, input, card, badge…).
+       FlyonUI est un plugin Tailwind sans version CDN : ce bloc reproduit
+       son API de classes avec le thème Maser. Avec une étape de build
+       (npm i flyonui + @plugin "flyonui") il peut être supprimé.
+       --------------------------------------------------------------- */
+    @layer components {
+      .btn { @apply inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50; }
+      .btn svg { @apply pointer-events-none size-4 shrink-0; }
+      .btn-sm { @apply h-7 gap-1 px-2.5 text-[0.8rem]; }
+      .btn-sm svg { @apply size-3.5; }
+      .btn-lg { @apply h-10; }
+      .btn-square { @apply size-8 px-0; }
+      .btn-block { @apply w-full; }
+      .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/80; }
+      .btn-outline { @apply border-border bg-card text-foreground hover:bg-muted; }
+      .btn-text { @apply text-foreground hover:bg-muted; }
+      .input { @apply h-8 w-full min-w-0 rounded-lg border border-input bg-muted px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm; }
+      .textarea { @apply min-h-16 w-full rounded-lg border border-input bg-muted px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; }
+      .select { @apply h-8 w-full min-w-0 appearance-none rounded-lg border border-input bg-muted bg-no-repeat px-2.5 py-1 pr-8 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 0.5rem center; }
+      .label-text { @apply text-sm leading-none font-medium select-none; }
+      .card { @apply flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10; }
+      .badge { @apply inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
+      .badge-outline { @apply border-border text-foreground; }
+      .badge-secondary { @apply bg-secondary text-secondary-foreground; }
+      .menu-item { @apply flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-none select-none hover:bg-accent focus:bg-accent; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }
+  </style>
+
+  <!-- ===================================================================
+       3) Moment.js et FlyonUI (JS)
+       =================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/flyonui@2.4.1/flyonui.js"></script>
+
+  <!-- ===================================================================
+       4) AlpineJS : données de démonstration + état de la page
+       =================================================================== -->
+  <script>
+    // Date du jour figée (cohérente avec les données de démonstration)
+    const TODAY = '2026-10-16';
+    // Données de démonstration (mêmes que le prototype)
+    const DATA = {"members":[{"id":"u1","name":"Karim Maser","initials":"KM","role":"Admin","title":"Managing Director"},{"id":"u2","name":"Sophie Laurent","initials":"SL","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u3","name":"Julien Moreau","initials":"JM","role":"Collaborator","title":"Structural Engineer","supervisorId":"u6"},{"id":"u4","name":"Amina Benali","initials":"AB","role":"Collaborator","title":"QA Engineer","supervisorId":"u2"},{"id":"u5","name":"Lucas Petit","initials":"LP","role":"Collaborator","title":"Electrical Engineer","supervisorId":"u2"},{"id":"u6","name":"Nora Haddad","initials":"NH","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u7","name":"Marc Fontaine","initials":"MF","role":"Client","title":"Operations Director","company":"Helios Energy"}],"allProjects":[{"id":"p1","code":"MSR-2401","name":"Solar Farm Substation Upgrade","client":"Helios Energy","description":"Design and commissioning of a 33/132 kV substation extension to connect the new 48 MW photovoltaic array to the regional grid.","status":"In Progress","priority":"High","startDate":"2026-08-03","endDate":"2026-12-18","tags":["Electrical","HV","Renewables"],"memberIds":["u2","u3","u4","u5"],"budget":1850000},{"id":"p2","code":"MSR-2402","name":"Rail Depot Structural Retrofit","client":"Nordline Rail","description":"Seismic retrofit of the main maintenance hall including steel frame reinforcement and foundation underpinning.","status":"In Progress","priority":"Medium","startDate":"2026-07-01","endDate":"2027-01-29","tags":["Structural","Seismic"],"memberIds":["u6","u3","u4"],"budget":2400000},{"id":"p3","code":"MSR-2403","name":"Water Treatment SCADA Migration","client":"Aquaterra Water","description":"Migration of legacy PLC control systems to a redundant SCADA architecture across three treatment plants.","status":"In Progress","priority":"High","startDate":"2026-09-07","endDate":"2026-11-27","tags":["Automation","SCADA"],"memberIds":["u2","u5","u4"],"budget":960000},{"id":"p4","code":"MSR-2404","name":"Logistics Hub HVAC Design","client":"Vantage Logistics","description":"Full mechanical and HVAC design package for a 40,000 m² automated logistics hub.","status":"In Progress","priority":"Low","startDate":"2026-09-21","endDate":"2027-02-12","tags":["Mechanical","HVAC"],"memberIds":["u6","u3"],"budget":540000},{"id":"p5","code":"MSR-2305","name":"Battery Storage Feasibility Study","client":"Helios Energy","description":"Technical and economic feasibility of a 20 MWh battery energy storage system.","status":"Closed","priority":"Medium","startDate":"2026-03-02","endDate":"2026-06-26","tags":["Study","Renewables"],"memberIds":["u2","u5"],"budget":180000},{"id":"p6","code":"MSR-2209","name":"Urban Footbridge Inspection","client":"Cité Urbaine","description":"Condition assessment and load testing of the municipal pedestrian bridge network.","status":"Archived","priority":"Low","startDate":"2025-11-03","endDate":"2026-02-20","tags":["Structural","Inspection"],"memberIds":["u6","u4"],"budget":95000}],"allTasks":[{"id":"t1","projectId":"p1","title":"Single-line diagram revision C","status":"Done","priority":"High","assigneeId":"u5","startDate":"2026-08-03","dueDate":"2026-08-28"},{"id":"t2","projectId":"p1","title":"Transformer foundation design","status":"Done","priority":"High","assigneeId":"u3","startDate":"2026-08-17","dueDate":"2026-09-18"},{"id":"t3","projectId":"p1","title":"Protection relay coordination study","status":"Review","priority":"High","assigneeId":"u5","startDate":"2026-09-14","dueDate":"2026-10-23"},{"id":"t4","projectId":"p1","title":"Earthing grid calculation","status":"In Progress","priority":"Medium","assigneeId":"u3","startDate":"2026-09-28","dueDate":"2026-10-30"},{"id":"t5","projectId":"p1","title":"Factory acceptance test plan","status":"In Progress","priority":"Medium","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t6","projectId":"p1","title":"Cable routing & trench layout","status":"To Do","priority":"Medium","assigneeId":"u3","startDate":"2026-10-26","dueDate":"2026-11-20"},{"id":"t7","projectId":"p1","title":"Site energisation procedure","status":"To Do","priority":"High","assigneeId":"u5","startDate":"2026-11-16","dueDate":"2026-12-11"},{"id":"t8","projectId":"p2","title":"Existing frame survey","status":"Done","priority":"High","assigneeId":"u3","startDate":"2026-07-01","dueDate":"2026-07-31"},{"id":"t9","projectId":"p2","title":"Finite element model","status":"In Progress","priority":"High","assigneeId":"u3","startDate":"2026-08-10","dueDate":"2026-10-30"},{"id":"t10","projectId":"p2","title":"Underpinning method statement","status":"To Do","priority":"Medium","assigneeId":"u6","startDate":"2026-11-02","dueDate":"2026-12-04"},{"id":"t11","projectId":"p2","title":"Load test procedure","status":"Review","priority":"Low","assigneeId":"u4","startDate":"2026-09-21","dueDate":"2026-10-20"},{"id":"t12","projectId":"p3","title":"I/O list consolidation","status":"Done","priority":"Medium","assigneeId":"u5","startDate":"2026-09-07","dueDate":"2026-09-25"},{"id":"t13","projectId":"p3","title":"Redundant server configuration","status":"In Progress","priority":"High","assigneeId":"u5","startDate":"2026-09-28","dueDate":"2026-10-23"},{"id":"t14","projectId":"p3","title":"HMI screen migration","status":"In Progress","priority":"Medium","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t15","projectId":"p3","title":"Cutover plan — Plant B","status":"To Do","priority":"High","assigneeId":"u2","startDate":"2026-11-02","dueDate":"2026-11-20"},{"id":"t16","projectId":"p4","title":"Heat load calculations","status":"In Progress","priority":"Medium","assigneeId":"u3","startDate":"2026-09-21","dueDate":"2026-10-30"},{"id":"t17","projectId":"p4","title":"Ductwork concept layout","status":"To Do","priority":"Low","assigneeId":"u3","startDate":"2026-11-02","dueDate":"2026-12-18"},{"id":"t18","projectId":"p5","title":"Final feasibility report","status":"Done","priority":"High","assigneeId":"u2","startDate":"2026-05-04","dueDate":"2026-06-26"},{"id":"t19","projectId":"p6","title":"Inspection report","status":"Done","priority":"Medium","assigneeId":"u4","startDate":"2025-12-01","dueDate":"2026-02-20"}],"allTests":[{"id":"q1","projectId":"p1","campaign":"FAT — Switchgear","name":"Insulation resistance test","status":"Passed","priority":"High","assigneeId":"u4","lastRun":"2026-10-08"},{"id":"q2","projectId":"p1","campaign":"FAT — Switchgear","name":"Breaker timing test","status":"Failed","priority":"High","assigneeId":"u4","lastRun":"2026-10-09"},{"id":"q3","projectId":"p1","campaign":"FAT — Protection","name":"Overcurrent relay injection","status":"Pending","priority":"High","assigneeId":"u5","lastRun":""},{"id":"q4","projectId":"p1","campaign":"FAT — Protection","name":"Differential relay stability","status":"Pending","priority":"Medium","assigneeId":"u5","lastRun":""},{"id":"q5","projectId":"p1","campaign":"Civil QA","name":"Concrete cube strength 28d","status":"Passed","priority":"Medium","assigneeId":"u3","lastRun":"2026-10-02"},{"id":"q6","projectId":"p2","campaign":"Material QA","name":"Weld ultrasonic inspection","status":"Passed","priority":"High","assigneeId":"u4","lastRun":"2026-09-30"},{"id":"q7","projectId":"p2","campaign":"Material QA","name":"Bolt torque verification","status":"Pending","priority":"Medium","assigneeId":"u4","lastRun":""},{"id":"q8","projectId":"p3","campaign":"SAT — Plant A","name":"Server failover switchover","status":"Failed","priority":"High","assigneeId":"u5","lastRun":"2026-10-12"},{"id":"q9","projectId":"p3","campaign":"SAT — Plant A","name":"Alarm historian logging","status":"Passed","priority":"Medium","assigneeId":"u4","lastRun":"2026-10-12"},{"id":"q10","projectId":"p3","campaign":"SAT — Plant A","name":"HMI navigation regression","status":"Pending","priority":"Low","assigneeId":"u4","lastRun":""}],"allMeetings":[{"id":"m1","projectId":"p1","title":"Weekly coordination","start":"2026-10-19T09:30:00","durationMin":60,"location":"Google Meet","attendeeIds":["u2","u3","u5"]},{"id":"m2","projectId":"p1","title":"Client progress review","start":"2026-10-21T14:00:00","durationMin":90,"location":"Helios HQ — Room 4B","attendeeIds":["u2","u7","u5"]},{"id":"m3","projectId":"p1","title":"FAT readiness review","start":"2026-10-28T10:00:00","durationMin":60,"location":"Maser Engineering office","attendeeIds":["u4","u5","u2"]},{"id":"m4","projectId":"p2","title":"Seismic design workshop","start":"2026-10-20T13:00:00","durationMin":120,"location":"Google Meet","attendeeIds":["u6","u3"]},{"id":"m5","projectId":"p3","title":"Failover retest debrief","start":"2026-10-22T11:00:00","durationMin":45,"location":"Plant A control room","attendeeIds":["u5","u4","u2"]},{"id":"m6","projectId":"p1","title":"Kick-off meeting","start":"2026-08-04T10:00:00","durationMin":120,"location":"Helios HQ","attendeeIds":["u2","u3","u5","u7"]}],"allNotes":[{"id":"n1","projectId":"p1","authorId":"u5","category":"Technical","content":"Relay coordination model updated with the grid operator's revised fault levels (31.5 kA). Settings for feeders F3–F6 need re-validation before FAT.","createdAt":"2026-10-14T09:42:00","comments":[{"id":"c1","authorId":"u2","content":"Thanks Lucas — can we have the revised settings sheet by Tuesday?","createdAt":"2026-10-14T11:05:00"}]},{"id":"n2","projectId":"p1","authorId":"u7","category":"Client","content":"Our site team confirms access to the north compound will be available from 2 November. Please coordinate crane deliveries with our HSE officer.","createdAt":"2026-10-13T16:20:00","comments":[]},{"id":"n3","projectId":"p1","authorId":"u3","category":"Site Visit","content":"Site visit completed. Transformer plinth formwork is in place; rebar inspection passed. Minor drainage clash identified near bay 2 — sketch attached to the drawing register.","createdAt":"2026-10-10T14:00:00","comments":[{"id":"c2","authorId":"u5","content":"I'll check the cable trench levels against that clash.","createdAt":"2026-10-10T15:30:00"}]},{"id":"n4","projectId":"p1","authorId":"u2","category":"Decision","content":"Agreed with Helios to move from SF6 to vacuum circuit breakers for the 33 kV switchboard. Amendment AV-003 raised.","createdAt":"2026-10-06T10:15:00","comments":[]},{"id":"n5","projectId":"p2","authorId":"u3","category":"Technical","content":"FE model shows column C4 utilisation at 1.08 under the new seismic spectrum. Proposing additional bracing in grid line C.","createdAt":"2026-10-12T08:30:00","comments":[]},{"id":"n6","projectId":"p3","authorId":"u5","category":"Technical","content":"Failover test on Plant A failed due to a heartbeat timeout misconfiguration. Fix deployed in staging, retest scheduled.","createdAt":"2026-10-12T17:45:00","comments":[]}],"allAmendments":[{"id":"a1","projectId":"p1","ref":"AV-001","title":"Additional 33 kV feeder bay","type":"Scope","status":"Approved","amount":142000,"daysImpact":10,"requestedBy":"u7","createdAt":"2026-08-24"},{"id":"a2","projectId":"p1","ref":"AV-002","title":"Delayed grid connection agreement","type":"Schedule","status":"Approved","amount":0,"daysImpact":14,"requestedBy":"u2","createdAt":"2026-09-15"},{"id":"a3","projectId":"p1","ref":"AV-003","title":"Switch to vacuum circuit breakers","type":"Budget","status":"Pending Approval","amount":68500,"daysImpact":0,"requestedBy":"u2","createdAt":"2026-10-06"},{"id":"a4","projectId":"p1","ref":"AV-004","title":"Extended SCADA integration","type":"Scope","status":"Draft","amount":37000,"daysImpact":5,"requestedBy":"u5","createdAt":"2026-10-14"},{"id":"a5","projectId":"p2","ref":"AV-001","title":"Additional bracing at grid line C","type":"Scope","status":"Pending Approval","amount":215000,"daysImpact":21,"requestedBy":"u6","createdAt":"2026-10-13"},{"id":"a6","projectId":"p3","ref":"AV-001","title":"Third plant cutover rescheduled","type":"Schedule","status":"Draft","amount":0,"daysImpact":7,"requestedBy":"u2","createdAt":"2026-10-11"}],"milestones":[{"id":"ms1","projectId":"p1","title":"Design freeze","date":"2026-09-25"},{"id":"ms2","projectId":"p1","title":"Factory acceptance","date":"2026-11-09"},{"id":"ms3","projectId":"p1","title":"Energisation","date":"2026-12-14"},{"id":"ms4","projectId":"p2","title":"Design approval","date":"2026-11-13"},{"id":"ms5","projectId":"p3","title":"Plant A go-live","date":"2026-10-30"},{"id":"ms6","projectId":"p4","title":"Concept review","date":"2026-11-27"}],"notifications":[{"id":"nt1","title":"Breaker timing test failed","detail":"Solar Farm Substation Upgrade · FAT — Switchgear","time":"2h ago","unread":true},{"id":"nt2","title":"Amendment AV-001 awaiting approval","detail":"Rail Depot Structural Retrofit","time":"Yesterday","unread":true},{"id":"nt3","title":"Marc Fontaine added a note","detail":"Solar Farm Substation Upgrade","time":"3 days ago","unread":true},{"id":"nt4","title":"Task moved to Review","detail":"Protection relay coordination study","time":"4 days ago","unread":false}]};
+  </script>
+  <script>
+    // Dates affichées comme en-GB (« Sept »)
+    moment.updateLocale('en', { monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sept_Oct_Nov_Dec'.split('_') });
+
+    const PALETTE = [
+      'bg-primary text-primary-foreground',
+      'bg-success text-success-foreground',
+      'bg-chart-5 text-primary-foreground',
+      'bg-[oklch(.62_.14_70)] text-white',
+      'bg-[#4f4c4d] text-white',
+    ];
+    const TONES = {
+      navy: 'bg-alt/12 text-alt-ink border-alt/25',
+      green: 'bg-success/12 text-success-ink border-success/25',
+      amber: 'bg-warning/12 text-warning-ink border-warning/25',
+      red: 'bg-destructive/12 text-destructive-ink border-destructive/25',
+      slate: 'bg-muted-foreground/12 text-muted-ink border-muted-foreground/25',
+    };
+    const PRIORITY_TONE = { High: 'red', Medium: 'amber', Low: 'slate' };
+    const TASK_TONE = { 'To Do': 'slate', 'In Progress': 'navy', Review: 'amber', Done: 'green' };
+    const DEADLINE = { overdue: ['Overdue', 'red'], soon: ['Due soon', 'amber'], 'on-track': ['On track', 'green'], complete: ['Delivered', 'slate'] };
+    const PROJECT_TONE = { 'In Progress': 'navy', Closed: 'green', Archived: 'slate' };
+    const ROLE_TONE = { Admin: 'bg-primary text-primary-foreground', Manager: 'bg-success/14 text-success-ink', Collaborator: 'bg-muted text-muted-foreground', Client: 'bg-warning/14 text-warning-ink' };
+    const DEFAULT_USER = { Admin: 'u1', Manager: 'u2', Collaborator: 'u3', Client: 'u7' };
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('app', () => ({
+        ...DATA,
+        allTasks: (() => { try { return JSON.parse(localStorage.getItem('maser-tasks')) || DATA.allTasks; } catch (_) { return DATA.allTasks; } })(),
+        // hiérarchie : surcharges éventuelles faites dans la page Organisation (localStorage)
+        members: (() => { let o = {}; try { o = JSON.parse(localStorage.getItem('maser-supervisors') || '{}'); } catch (_) {} return DATA.members.map((m) => (m.id in o ? { ...m, supervisorId: o[m.id] || undefined } : m)); })(),
+        allTasks: (() => { try { return JSON.parse(localStorage.getItem('maser-tasks')) || DATA.allTasks; } catch (_) { return DATA.allTasks; } })(),
+        allMeetings: (() => { try { return JSON.parse(localStorage.getItem('maser-meetings')) || DATA.allMeetings; } catch (_) { return DATA.allMeetings; } })(),
+        allNotes: (() => { try { return JSON.parse(localStorage.getItem('maser-notes')) || DATA.allNotes; } catch (_) { return DATA.allNotes; } })(),
+        allTests: (() => { try { return JSON.parse(localStorage.getItem('maser-tests')) || DATA.allTests; } catch (_) { return DATA.allTests; } })(),
+        page: 'team-schedule.html',
+        TONES, ROLE_TONE,
+        userId: localStorage.getItem('maser-user') || 'u2',
+        layout: (() => { try { return JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}').navLayout || 'side'; } catch (_) { return 'side'; } })(),
+        mobileOpen: false, createOpen: false, profileOpen: false, notifOpen: false,
+        query: '', searchOpen: false,
+        form: { name: '', client: '', priority: 'Medium', startDate: '2026-10-19', endDate: '2027-03-26', tags: '', budget: '', description: '' },
+        nav: [
+          { href: 'dashboard.html', label: 'Dashboard', icon: 'layout-dashboard' },
+          { href: 'projects.html', label: 'Projects', icon: 'folder-kanban', projects: true },
+          { href: 'tasks.html', label: 'Tasks', icon: 'list-checks', opt: 'tasks' },
+          { href: 'tests.html', label: 'Tests', icon: 'flask-conical', opt: 'tests' },
+          { href: 'notes.html', label: 'Notes', icon: 'notebook-pen', opt: 'notes' },
+          { href: 'amendments.html', label: 'Amendments', icon: 'file-diff', hint: 'Avenants', opt: 'amendments' },
+          { href: 'meetings.html', label: 'Meetings', icon: 'calendar-days', hint: 'Réunions', opt: 'meetings' },
+          { href: 'team-schedule.html', label: 'Team Schedule', icon: 'calendar-range', hint: 'Planning', only: ['Admin', 'Manager'] },
+          { href: 'organisation.html', label: 'Organisation', icon: 'users', hint: 'Hiérarchie' },
+          { href: 'my-schedule.html', label: 'My Schedule', icon: 'calendar-range', hint: 'Planning', only: ['Collaborator'] },
+        ],
+        roles: [
+          { role: 'Admin', description: 'Full access & settings' },
+          { role: 'Manager', description: 'Manage their projects & team' },
+          { role: 'Collaborator', description: 'Work on assigned tasks' },
+          { role: 'Client', description: 'Client Space only' },
+        ],
+
+        // ---------- utilisateur, rôle, droits de lecture ----------
+        get user() { return this.members.find((m) => m.id === this.userId) || this.members[1]; },
+        get role() { return this.eff(this.user); },
+        get isClient() { return this.role === 'Client'; },
+        get items() { return this.nav.filter((i) => (!i.only || i.only.includes(this.role)) && (!i.opt || this.optPages[i.opt])); },
+        get sameRole() { return this.members.filter((m) => this.eff(m) === this.role); },
+        subs(id) {
+          const out = [], seen = new Set([id]), q = [id];
+          while (q.length) { const x = q.shift(); this.members.forEach((m) => { if (m.supervisorId === x && !seen.has(m.id)) { seen.add(m.id); out.push(m); q.push(m.id); } }); }
+          return out;
+        },
+        access(p) {
+          if (this.role === 'Admin') return true;
+          return [this.user, ...this.subs(this.user.id)].some((m) => p.memberIds.includes(m.id));
+        },
+        // un collaborateur ne voit que ses projets ; Admin et Manager voient tout
+        get scoped() { return this.role === 'Collaborator'; },
+        get projects() { return this.scoped ? this.allProjects.filter((p) => this.access(p)) : this.allProjects; },
+        get pids() { return new Set(this.projects.map((p) => p.id)); },
+        get tasks() { return this.scoped ? this.allTasks.filter((t) => this.pids.has(t.projectId)) : this.allTasks; },
+        get tests() { return this.scoped ? this.allTests.filter((t) => this.pids.has(t.projectId)) : this.allTests; },
+        get meetings() { return this.scoped ? this.allMeetings.filter((m) => this.pids.has(m.projectId)) : this.allMeetings; },
+        get notes() {
+          const team = new Set([this.user, ...this.subs(this.user.id)].map((m) => m.id));
+          return this.allNotes.filter((n) => {
+            const p = this.getProject(n.projectId);
+            if (this.role === 'Collaborator') return !!p && this.access(p);
+            if (this.role === 'Manager') return !!p && (p.memberIds.includes(this.user.id) || team.has(n.authorId));
+            return true;
+          });
+        },
+        getMember(id) { return this.members.find((m) => m.id === id); },
+        getProject(id) { return this.allProjects.find((p) => p.id === id); },
+        progress(p) {
+          const l = this.allTasks.filter((t) => t.projectId === p.id);
+          if (!l.length) return 0;
+          const s = l.reduce((a, t) => a + (t.status === 'Done' ? 1 : t.status === 'Review' ? 0.75 : t.status === 'In Progress' ? 0.4 : 0), 0);
+          return Math.round((s / l.length) * 100);
+        },
+
+        // ---------- dates (Moment.js) ----------
+        daysUntil(d) { return moment(d).startOf('day').diff(moment(TODAY), 'days'); },
+        deadlineState(end, done) {
+          if (done) return 'complete';
+          const n = this.daysUntil(end);
+          return n < 0 ? 'overdue' : n <= 14 ? 'soon' : 'on-track';
+        },
+        fd(d, f = 'D MMM') { return moment(d).format(f); },
+        ft(d) { return moment(d).format('HH:mm'); },
+        fdt(d) { return moment(d).format('D MMM') + ' · ' + moment(d).format('HH:mm'); },
+
+        // ---------- aides d'affichage ----------
+        color(id) { return PALETTE[id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTE.length]; },
+        stack(ids, max = 4) { return ids.slice(0, max).map((id) => this.getMember(id)).filter(Boolean); },
+        rest(ids, max = 4) { return Math.max(0, ids.length - max); },
+        isActive(href) { return href === this.page; },
+        get unread() { return this.notifications.filter((n) => n.unread).length; },
+
+        // ---------- recherche globale ----------
+        // ---------- pages transversales facultatives (désactivées par défaut, activables dans Settings) ----------
+        optPages: (() => { const base = { tasks: false, tests: false, notes: false, amendments: false, meetings: false }; try { return { ...base, ...(JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}').optPages || {}) }; } catch (_) { return base; } })(),
+        get pageEnabled() { return !this.optKey || !!this.optPages[this.optKey]; },
+
+        // ---------- rôle effectif : être placé au-dessus d'un manager (directement ou non) donne les droits de manager ----------
+        eff(m) { return m.role === 'Collaborator' && this.subs(m.id).some((s) => s.role === 'Manager') ? 'Manager' : m.role; },
+
+        // ---------- sous-menu « Projects » : projets accessibles, rangés par catégories ----------
+        projOpen: {},
+        projMenu: { open: false, x: 0, y: 0 },
+        get inProjects() { return this.page === 'projects.html'; },
+        get currentProjectId() { return this.projectId ?? null; },
+        get projectGroups() {
+          const isMine = (p) => this.role === 'Admin' || this.access(p);
+          const sort = (l) => [...l].sort((a, b) => a.code.localeCompare(b.code));
+          const active = this.projects.filter((p) => p.status === 'In Progress'), done = this.projects.filter((p) => p.status !== 'In Progress');
+          return [
+            { id: 'mine', label: 'My projects', items: sort(active.filter(isMine)) },
+            { id: 'other', label: 'Other projects', hint: 'view only', items: sort(active.filter((p) => !isMine(p))) },
+            { id: 'closed', label: 'Closed & archived', items: sort(done) },
+          ].filter((g) => g.items.length > 0);
+        },
+        isOpen(g) { return this.projOpen[g.id] ?? (g.id === 'mine' || g.items.some((p) => p.id === this.currentProjectId)); },
+        toggleGroup(g) { this.projOpen = { ...this.projOpen, [g.id]: !this.isOpen(g) }; },
+        openProjMenu(ev) { const r = ev.currentTarget.getBoundingClientRect(); this.projMenu = { open: !this.projMenu.open, x: Math.max(8, Math.min(r.left, window.innerWidth - 296)), y: r.bottom + 6 }; },
+
+        // ---------- recherche globale : projets, tâches, tests, notes — la page courante passe en premier ----------
+        get results() {
+          const q = this.query.trim().toLowerCase();
+          if (!q) return [];
+          const has = (...s) => s.some((x) => (x || '').toLowerCase().includes(q));
+          const pn = (id) => this.getProject(id)?.name ?? '';
+          const snippet = (s) => (s.length > 70 ? s.slice(0, 67) + '…' : s);
+          const items = [
+            ...this.projects.filter((x) => has(x.name, x.client, x.code, ...x.tags)).map((x) => ({ key: 'p' + x.id, kind: 'project', projectId: x.id, title: x.name, sub: `${x.code} · ${x.client}`, href: `project-detail.html?id=${x.id}` })),
+            ...this.tasks.filter((x) => has(x.title)).map((x) => ({ key: 't' + x.id, kind: 'task', projectId: x.projectId, title: x.title, sub: `Task · ${pn(x.projectId)}`, href: `project-detail.html?id=${x.projectId}&tab=tasks` })),
+            ...this.tests.filter((x) => has(x.name, x.campaign)).map((x) => ({ key: 'q' + x.id, kind: 'test', projectId: x.projectId, title: x.name, sub: `Test · ${x.campaign} · ${pn(x.projectId)}`, href: `project-detail.html?id=${x.projectId}&tab=tests` })),
+            ...this.notes.filter((x) => has(x.content)).map((x) => ({ key: 'n' + x.id, kind: 'note', projectId: x.projectId, title: snippet(x.content), sub: `Note · ${x.category} · ${pn(x.projectId)}`, href: `project-detail.html?id=${x.projectId}&tab=notes` })),
+          ];
+          const ctx = this.searchCtx ?? { project: null, kind: null }, labels = { project: 'Projects', task: 'Tasks', test: 'Tests', note: 'Notes' };
+          const out = [], used = new Set();
+          if (ctx.project) {
+            const here = items.filter((i) => i.projectId === ctx.project).sort((a, b) => (b.kind === ctx.kind) - (a.kind === ctx.kind));
+            if (here.length) { out.push({ header: true, key: 'h-here', label: 'In this project' }); here.slice(0, 6).forEach((i) => { out.push(i); used.add(i.key); }); }
+          }
+          const order = ['project', 'task', 'test', 'note'], kinds = ctx.kind ? [ctx.kind, ...order.filter((k) => k !== ctx.kind)] : order;
+          for (const k of kinds) {
+            const g = items.filter((i) => i.kind === k && !used.has(i.key)).slice(0, 4);
+            if (g.length) { out.push({ header: true, key: 'h-' + k, label: labels[k] }); out.push(...g); }
+          }
+          return out;
+        },
+        get firstResult() { return this.results.find((r) => !r.header); },
+        go(href) { window.location.href = href; },
+
+        // ---------- profil : rôle, personne, position du menu ----------
+        switchRole(next) {
+          localStorage.setItem('maser-user', DEFAULT_USER[next]);
+          this.userId = DEFAULT_USER[next];
+          this.profileOpen = false;
+          if (next === 'Client') this.go('client-space.html');
+        },
+        switchUser(id) { localStorage.setItem('maser-user', id); this.userId = id; this.profileOpen = false; },
+        setLayout(v) {
+          this.layout = v;
+          let p = {}; try { p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'); } catch (_) {}
+          p.navLayout = v; localStorage.setItem('maser-prefs-v1', JSON.stringify(p));
+          if (v === 'side') document.documentElement.removeAttribute('data-nav'); else document.documentElement.setAttribute('data-nav', v);
+          this.mobileOpen = false;
+        },
+        closeAll() { this.mobileOpen = false; this.createOpen = false; this.profileOpen = false; this.notifOpen = false; this.searchOpen = false; this.projMenu.open = false; },
+
+        // ---------- création de projet (visuel : redirige vers la liste) ----------
+        openCreate() { this.mobileOpen = false; this.createOpen = true; this.$nextTick(() => this.$refs.pname && this.$refs.pname.focus()); },
+        get validForm() { return this.form.name.trim() && this.form.client.trim() && this.form.startDate && this.form.endDate >= this.form.startDate; },
+        submitProject() { if (this.validForm) this.go('projects.html'); },
+
+        // ---------- Planning des équipes ----------
+        view: 'timeline', filter: 'active',
+        PROJECT_COLORS: ['var(--primary)', 'var(--success)', 'var(--chart-5)', 'oklch(.62 .14 70)', '#4f4c4d', 'var(--muted-foreground)'],
+        PHASE_TONE: { Current: 'bg-success/12 text-success-ink border-success/25', Upcoming: 'bg-alt/12 text-alt-ink border-alt/25', Completed: 'bg-muted-foreground/12 text-muted-ink border-muted-foreground/25' },
+
+        // accès : Admin (tout le monde) et Manager (lui-même + sa hiérarchie)
+        get canSeePage() { return this.role === 'Admin' || this.role === 'Manager'; },
+        get staff() {
+          if (this.role === 'Admin') return this.members.filter((m) => m.role !== 'Client');
+          if (this.role === 'Manager') return [this.user, ...this.subs(this.user.id)];
+          return [];
+        },
+        get pageDescription() {
+          return this.role === 'Admin'
+            ? 'Who is working on which project, and over which period. Admin view of staff allocation.'
+            : 'Who is working on which project, and over which period, for you and the people reporting to you.';
+        },
+        phase(a) { return a.end < TODAY ? 'Completed' : a.start > TODAY ? 'Upcoming' : 'Current'; },
+        colorOf(pid) { return this.PROJECT_COLORS[Math.max(0, this.projects.findIndex((p) => p.id === pid)) % this.PROJECT_COLORS.length]; },
+        get filterOptions() {
+          return [{ value: 'active', label: 'Active projects' }, { value: 'all', label: 'All projects' }, ...this.projects.map((p) => ({ value: p.id, label: `${p.code} · ${p.name}` }))];
+        },
+
+        // Affectations calculées à partir des tâches (période = première date de début → dernière échéance)
+        get sched() {
+          const LANE = 28, DAY = 86400000, ms = (d) => new Date(d + 'T00:00:00').getTime();
+          const shown = this.projects.filter((p) => (this.filter === 'active' ? p.status === 'In Progress' : this.filter === 'all' ? true : p.id === this.filter));
+          const rows = this.staff.map((m) => {
+            const list = [];
+            for (const p of shown) {
+              const mine = this.tasks.filter((t) => t.projectId === p.id && t.assigneeId === m.id);
+              if (mine.length) {
+                list.push({ memberId: m.id, projectId: p.id, start: mine.reduce((a, t) => (t.startDate < a ? t.startDate : a), mine[0].startDate), end: mine.reduce((a, t) => (t.dueDate > a ? t.dueDate : a), mine[0].dueDate), tasks: mine.length, fromTasks: true });
+              } else if (p.memberIds.includes(m.id)) {
+                list.push({ memberId: m.id, projectId: p.id, start: p.startDate, end: p.endDate, tasks: 0, fromTasks: false });
+              }
+            }
+            list.sort((a, b) => a.start.localeCompare(b.start));
+            const laneEnds = [];
+            const placed = list.map((a) => { let lane = laneEnds.findIndex((e) => e < a.start); if (lane === -1) lane = laneEnds.length; laneEnds[lane] = a.end; return { ...a, lane }; });
+            return { member: m, assignments: placed, lanes: Math.max(1, laneEnds.length) };
+          });
+          const all = rows.flatMap((r) => r.assignments);
+          const out = { rows, all, count: all.length, current: rows.filter((r) => r.assignments.some((a) => this.phase(a) === 'Current')).length, people: rows.length };
+          if (!all.length) return out;
+
+          // liste
+          out.flat = rows.flatMap((r) => r.assignments.map((a) => ({ ...a, member: r.member, p: this.getProject(a.projectId), ph: this.phase(a) })))
+            .sort((a, b) => a.member.name.localeCompare(b.member.name) || a.start.localeCompare(b.start));
+
+          // chronologie
+          const dates = [...all.flatMap((a) => [a.start, a.end]), TODAY];
+          const dMin = new Date(dates.reduce((a, b) => (a < b ? a : b)) + 'T00:00:00'), dMax = new Date(dates.reduce((a, b) => (a > b ? a : b)) + 'T00:00:00');
+          const rs = new Date(dMin.getFullYear(), dMin.getMonth(), 1), re = new Date(dMax.getFullYear(), dMax.getMonth() + 1, 1);
+          const span = re - rs, pct = (d) => ((ms(d) - rs) / span) * 100;
+          out.months = [];
+          for (let d = new Date(rs); d < re; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) out.months.push({ label: moment(d).format('MMM YY'), left: ((d - rs) / span) * 100 });
+          out.todayPct = pct(TODAY);
+          out.minWidth = Math.max(720, Math.round(span / DAY) * 6);
+          out.legend = Array.from(new Set(all.map((a) => a.projectId))).map((id) => this.getProject(id));
+          out.tl = rows.map((r) => {
+            const now = r.assignments.filter((a) => this.phase(a) === 'Current').length;
+            return {
+              member: r.member, height: r.lanes * LANE + 16, now, status: now ? `${now} project${now > 1 ? 's' : ''} now` : 'Available',
+              bars: r.assignments.map((a) => {
+                const p = this.getProject(a.projectId), c = this.colorOf(a.projectId), left = pct(a.start);
+                return {
+                  key: a.projectId, p, left, width: Math.max(pct(a.end) - left, 1), top: 8 + a.lane * LANE + 2,
+                  bg: a.fromTasks ? c : `repeating-linear-gradient(135deg, ${c} 0 6px, color-mix(in oklch, ${c} 60%, transparent) 6px 12px)`,
+                  title: `${p.name} · ${this.fd(a.start)} → ${this.fd(a.end)} · ${a.tasks ? a.tasks + ' task' + (a.tasks > 1 ? 's' : '') : 'no task yet'}`,
+                  aria: `${r.member.name} on ${p.name}: ${this.fd(a.start, 'D MMM YYYY')} to ${this.fd(a.end, 'D MMM YYYY')}`,
+                };
+              }),
+            };
+          });
+          return out;
+        },
+      }));
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="app" @keydown.escape.window="closeAll()">
+
+  <!-- Sprite d'icônes Lucide -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
+    <symbol id="i-layout-dashboard" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol>
+    <symbol id="i-folder-kanban" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></symbol>
+    <symbol id="i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></symbol>
+    <symbol id="i-flask-conical" viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></symbol>
+    <symbol id="i-chart-gantt" viewBox="0 0 24 24"><path d="M10 6h8"/><path d="M12 16h6"/><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 11h7"/></symbol>
+    <symbol id="i-notebook-pen" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></symbol>
+    <symbol id="i-file-diff" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M9 10h6"/><path d="M12 7v6"/><path d="M9 17h6"/></symbol>
+    <symbol id="i-calendar-days" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></symbol>
+    <symbol id="i-calendar-range" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M17 14h-6"/><path d="M13 18H7"/><path d="M7 14h.01"/><path d="M17 18h.01"/></symbol>
+    <symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M16 14v2.2l1.6 1"/><path d="M16 2v4"/><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M3 10h5"/><path d="M8 2v4"/><circle cx="16" cy="16" r="6"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-building-2" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+    <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></symbol>
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></symbol>
+    <symbol id="i-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  </svg>
+
+  <!-- Liste de sécurité : classes appliquées dynamiquement par Alpine -->
+  <div class="hidden" aria-hidden="true">
+    <span class="bg-alt/12 text-alt-ink border-alt/25 bg-success/12 text-success-ink border-success/25 bg-warning/12 text-warning-ink border-warning/25 bg-destructive/12 text-destructive-ink border-destructive/25 bg-muted-foreground/12 text-muted-ink border-muted-foreground/25 bg-alt/14 bg-warning/14 bg-success/14 bg-destructive/14 bg-success/14 bg-primary text-primary-foreground bg-success text-success-foreground bg-chart-5 bg-[oklch(.62_.14_70)] text-white bg-[#4f4c4d] bg-muted text-muted-foreground bg-sidebar-accent text-sidebar-accent-foreground text-sidebar-primary text-sidebar-foreground/60 text-sidebar-foreground/80 text-sidebar-foreground/40 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground translate-x-0 -translate-x-full lg:pl-64 bg-success/12 text-success-ink border-success/25 bg-alt/12 text-alt-ink border-alt/25 bg-muted-foreground/12 text-muted-ink border-muted-foreground/25 text-success-ink"></span>
+  </div>
+
+  <div :class="layout === 'top' ? 'flex min-h-dvh flex-col' : 'flex min-h-dvh'">
+
+    <!-- ============ Voile du tiroir mobile ============ -->
+    <div x-show="mobileOpen && layout === 'side'" x-cloak x-transition.opacity.duration.150ms @click="mobileOpen = false"
+         class="fixed inset-0 z-40 bg-black/10 backdrop-blur-xs lg:hidden"></div>
+
+    <!-- ============ Barre latérale (tiroir sur mobile) ============ -->
+    <aside x-show="layout === 'side'"
+           class="fixed inset-y-0 left-0 z-50 w-72 border-r border-sidebar-border transition-transform duration-200 ease-in-out lg:z-40 lg:w-64 lg:translate-x-0"
+           :class="mobileOpen ? 'translate-x-0' : '-translate-x-full'" aria-label="Sidebar">
+      <div class="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+        <div class="flex h-16 items-center px-5">
+          <a href="dashboard.html" class="flex items-center gap-2.5" aria-label="Maser Engineering — Dashboard">
+            <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-sidebar-primary font-mono text-sm font-bold text-sidebar-primary-foreground">M</span>
+            <span class="flex flex-col leading-none">
+              <span class="text-sm font-semibold tracking-tight text-sidebar-accent-foreground">Maser</span>
+              <span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-sidebar-foreground/60 uppercase">Engineering</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="px-3 pb-4" x-show="!isClient">
+          <button type="button" @click="openCreate()" class="btn btn-primary w-full justify-start bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90">
+            <svg class="i"><use href="#i-plus"/></svg>
+            New Project
+          </button>
+        </div>
+
+        <nav aria-label="Main" class="flex-1 overflow-y-auto px-3">
+          <template x-if="!isClient">
+            <div>
+              <p class="px-2 pb-2 text-[11px] font-medium tracking-wider text-sidebar-foreground/50 uppercase">Workspace</p>
+              <ul class="flex flex-col gap-0.5">
+                <template x-for="item in items" :key="item.href">
+                  <li>
+                    <a :href="item.href" :aria-current="isActive(item.href) ? 'page' : null"
+                       class="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors"
+                       :class="isActive(item.href) ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                      <svg class="i size-4" :class="isActive(item.href) ? 'text-sidebar-primary' : 'text-sidebar-foreground/60'"><use :href="'#i-' + item.icon"/></svg>
+                      <span class="flex-1" x-text="item.label"></span>
+                      <span x-show="item.hint" class="text-[10px] text-sidebar-foreground/40 italic" x-text="item.hint"></span>
+                    </a>
+                    <template x-if="item.projects && inProjects">
+                      <div class="mt-1 mb-1 ml-[1.15rem] flex flex-col gap-1 border-l border-sidebar-border pl-2">
+                        <template x-for="g in projectGroups" :key="g.id">
+                          <div>
+                            <button type="button" @click="toggleGroup(g)" :aria-expanded="isOpen(g)" class="flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium tracking-wide text-sidebar-foreground/60 uppercase hover:text-sidebar-accent-foreground">
+                              <svg class="i size-3 transition-transform" :class="isOpen(g) ? '' : '-rotate-90'"><use href="#i-chevron-down"/></svg>
+                              <span class="flex-1 text-left"><span x-text="g.label"></span> <span x-show="g.hint" class="text-[9px] font-normal normal-case italic" x-text="'(' + g.hint + ')'"></span></span>
+                              <span class="font-mono text-[10px] normal-case" x-text="g.items.length"></span>
+                            </button>
+                            <ul x-show="isOpen(g)" class="mt-0.5 flex flex-col gap-0.5">
+                              <template x-for="p in g.items" :key="p.id">
+                                <li>
+                                  <a :href="'project-detail.html?id=' + p.id" :title="p.code + ' · ' + p.name" :aria-current="p.id === currentProjectId ? 'page' : null"
+                                     class="flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] transition-colors"
+                                     :class="p.id === currentProjectId ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                                    <span class="font-mono text-[10px] text-sidebar-foreground/50" x-text="p.code.replace('MSR-', '')"></span>
+                                    <span class="truncate" x-text="p.name"></span>
+                                  </a>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
+          <p class="px-2 pb-2 text-[11px] font-medium tracking-wider text-sidebar-foreground/50 uppercase" :class="isClient ? '' : 'pt-6'">External</p>
+          <ul>
+            <li>
+              <a href="client-space.html" class="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground">
+                <svg class="i size-4 text-sidebar-foreground/60"><use href="#i-building-2"/></svg>
+                <span class="flex-1">Client Space</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="m-3 rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3">
+          <p class="text-xs font-medium text-sidebar-accent-foreground">Prototype mode</p>
+          <p class="mt-1 text-xs leading-relaxed text-sidebar-foreground/70">Switch roles from the profile menu to preview Admin, Manager, Collaborator and Client views.</p>
+        </div>
+      </div>
+    </aside>
+
+    <div :class="layout === 'top' ? 'flex min-w-0 flex-1 flex-col' : 'flex min-w-0 flex-1 flex-col lg:pl-64'">
+
+      <!-- ============ Barre supérieure (+ menu haut en option) ============ -->
+      <header class="sticky top-0 z-30">
+        <div class="flex h-16 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur md:px-6">
+
+          <button x-show="layout === 'side'" type="button" @click="mobileOpen = true" class="btn btn-text btn-square lg:hidden" aria-label="Open navigation">
+            <svg class="i"><use href="#i-menu"/></svg>
+          </button>
+          <a x-show="layout === 'top'" x-cloak href="dashboard.html" class="mr-2 flex shrink-0 items-center gap-2.5" aria-label="Maser Engineering — Dashboard">
+            <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-sidebar-primary font-mono text-sm font-bold text-sidebar-primary-foreground">M</span>
+            <span class="flex flex-col leading-none">
+              <span class="text-sm font-semibold tracking-tight text-foreground">Maser</span>
+              <span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">Engineering</span>
+            </span>
+          </a>
+
+          <!-- Recherche globale -->
+          <div class="relative w-full max-w-md" @click.outside="searchOpen = false">
+            <svg aria-hidden="true" class="i pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"><use href="#i-search"/></svg>
+            <input type="search" x-model="query" @input="searchOpen = true" @focus="searchOpen = true"
+                   @keydown.enter="firstResult && go(firstResult.href)"
+                   placeholder="Search projects, tasks, tests, notes..." aria-label="Global search" class="input h-9 pl-9">
+            <div x-show="searchOpen && query.trim()" x-cloak class="absolute inset-x-0 top-full z-50 mt-1.5 overflow-hidden rounded-lg border bg-popover shadow-lg">
+              <p x-show="results.length === 0" class="px-3 py-4 text-sm text-muted-foreground">No results for “<span x-text="query"></span>”</p>
+              <ul x-show="results.length > 0" role="listbox" aria-label="Search results" class="max-h-96 overflow-y-auto p-1">
+                <template x-for="r in results" :key="r.key">
+                  <li :role="r.header ? 'presentation' : 'option'">
+                    <p x-show="r.header" class="px-2.5 pt-2 pb-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase" x-text="r.label"></p>
+                    <button x-show="!r.header" type="button" @click="go(r.href)" class="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-left hover:bg-accent">
+                      <svg class="i size-4 shrink-0" :class="r.kind === 'project' ? 'text-primary' : 'text-muted-foreground'"><use :href="'#i-' + ({ project: 'folder-kanban', task: 'list-checks', test: 'flask-conical', note: 'notebook-pen' })[r.kind]"/></svg>
+                      <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium" x-text="r.title"></span>
+                        <span class="block truncate text-xs text-muted-foreground" x-text="r.sub"></span>
+                      </span>
+                    </button>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ml-auto flex items-center gap-1.5">
+            <button x-show="layout === 'top' && !isClient" x-cloak type="button" @click="openCreate()" class="btn btn-primary mr-1 hidden sm:inline-flex">
+              <svg class="i"><use href="#i-plus"/></svg>
+              New Project
+            </button>
+
+            <!-- Notifications -->
+            <div class="relative" @click.outside="notifOpen = false">
+              <button type="button" @click="notifOpen = !notifOpen; profileOpen = false" class="btn btn-text btn-square relative"
+                      :aria-label="`Notifications, ${unread} unread`" :aria-expanded="notifOpen">
+                <svg class="i"><use href="#i-bell"/></svg>
+                <span x-show="unread > 0" class="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-destructive text-[9px] font-semibold text-white" x-text="unread"></span>
+              </button>
+              <div x-show="notifOpen" x-cloak x-transition.opacity.duration.100ms role="menu"
+                   class="absolute top-full right-0 z-50 mt-1 w-80 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+                <div class="flex items-center justify-between px-1.5 py-1 text-xs font-medium text-muted-foreground">
+                  Notifications <span class="font-normal" x-text="unread + ' new'"></span>
+                </div>
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <template x-for="n in notifications" :key="n.id">
+                  <div role="menuitem" class="flex items-start gap-3 rounded-md px-1.5 py-2 text-sm hover:bg-accent">
+                    <span aria-hidden="true" class="mt-1.5 size-2 shrink-0 rounded-full" :class="n.unread ? 'bg-success' : 'bg-transparent'"></span>
+                    <span class="min-w-0 flex-1">
+                      <span class="block text-sm font-medium" x-text="n.title"></span>
+                      <span class="block truncate text-xs text-muted-foreground" x-text="n.detail"></span>
+                    </span>
+                    <span class="shrink-0 text-[11px] text-muted-foreground" x-text="n.time"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Profil -->
+            <div class="relative" @click.outside="profileOpen = false">
+              <button type="button" @click="profileOpen = !profileOpen; notifOpen = false" class="btn btn-text h-10 gap-2.5 px-2" aria-label="Open profile menu" :aria-expanded="profileOpen">
+                <span class="relative flex size-8 shrink-0 rounded-full select-none">
+                  <span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="color(user.id)" x-text="user.initials"></span>
+                </span>
+                <span class="hidden flex-col items-start leading-tight sm:flex">
+                  <span class="text-sm font-medium" x-text="user.name"></span>
+                  <span class="text-[11px] font-normal text-muted-foreground" x-text="user.title"></span>
+                </span>
+                <span class="badge hidden rounded-md border-transparent md:inline-flex" :class="ROLE_TONE[role]" x-text="role"></span>
+                <svg class="i text-muted-foreground"><use href="#i-chevron-down"/></svg>
+              </button>
+
+              <div x-show="profileOpen" x-cloak x-transition.opacity.duration.100ms role="menu"
+                   class="absolute top-full right-0 z-50 mt-1 max-h-[calc(100dvh-5rem)] w-64 overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+                <div class="px-1.5 py-1 text-xs font-medium text-muted-foreground">
+                  <span class="block text-sm font-medium text-foreground" x-text="user.name"></span>
+                  <span class="block text-xs font-normal" x-text="(user.company || 'Maser Engineering') + ' · ' + role"></span>
+                </div>
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+
+                <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-shield-check"/></svg>View as role</div>
+                <template x-for="r in roles" :key="r.role">
+                  <button type="button" role="menuitemradio" :aria-checked="role === r.role" @click="switchRole(r.role)" class="menu-item relative py-1 pr-8">
+                    <span class="flex flex-col">
+                      <span x-text="r.role"></span>
+                      <span class="text-xs text-muted-foreground" x-text="r.description"></span>
+                    </span>
+                    <svg x-show="role === r.role" class="i absolute right-2 size-4"><use href="#i-check"/></svg>
+                  </button>
+                </template>
+
+                <template x-if="sameRole.length > 1">
+                  <div>
+                    <div class="-mx-1 my-1 h-px bg-border"></div>
+                    <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-users"/></svg><span x-text="`Switch person (${role})`"></span></div>
+                    <template x-for="m in sameRole" :key="m.id">
+                      <button type="button" role="menuitemradio" :aria-checked="user.id === m.id" @click="switchUser(m.id)" class="menu-item relative py-1 pr-8">
+                        <span class="flex flex-col">
+                          <span x-text="m.name"></span>
+                          <span class="text-xs text-muted-foreground" x-text="m.title"></span>
+                        </span>
+                        <svg x-show="user.id === m.id" class="i absolute right-2 size-4"><use href="#i-check"/></svg>
+                      </button>
+                    </template>
+                  </div>
+                </template>
+
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-layout-grid"/></svg>Menu position</div>
+                <button type="button" role="menuitemradio" :aria-checked="layout === 'side'" @click="setLayout('side')" class="menu-item relative py-1 pr-8">Side menu<svg x-show="layout === 'side'" class="i absolute right-2 size-4"><use href="#i-check"/></svg></button>
+                <button type="button" role="menuitemradio" :aria-checked="layout === 'top'" @click="setLayout('top')" class="menu-item relative py-1 pr-8">Top menu<svg x-show="layout === 'top'" class="i absolute right-2 size-4"><use href="#i-check"/></svg></button>
+
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <a href="settings.html" role="menuitem" class="menu-item"><svg class="i size-4"><use href="#i-settings"/></svg>Settings</a>
+                <a href="login.html" role="menuitem" class="menu-item"><svg class="i size-4"><use href="#i-log-out"/></svg>Sign out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu horizontal (position « Top ») -->
+        <nav x-show="layout === 'top'" x-cloak aria-label="Main" class="overflow-x-auto bg-sidebar text-sidebar-foreground">
+          <ul class="mx-auto flex min-w-max items-center gap-0.5 px-3 py-1.5 md:px-6">
+            <template x-for="item in (isClient ? [] : items)" :key="item.href">
+              <li class="flex items-center">
+                <a :href="item.href" :aria-current="isActive(item.href) ? 'page' : null" :title="item.hint ? `${item.label} (${item.hint})` : item.label"
+                   class="relative flex items-center gap-2 rounded-md px-3 py-1.5 text-sm whitespace-nowrap outline-none transition-colors focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                   :class="isActive(item.href) ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                  <svg class="i size-4" :class="isActive(item.href) ? 'text-sidebar-primary' : 'text-sidebar-foreground/60'"><use :href="'#i-' + item.icon"/></svg>
+                  <span x-text="item.label"></span>
+                </a>
+                <button x-show="item.projects && inProjects" type="button" @click.stop="openProjMenu($event)" aria-haspopup="menu" :aria-expanded="projMenu.open" aria-label="Switch project"
+                        class="-ml-1 grid size-7 cursor-pointer place-items-center rounded-md text-sidebar-foreground/70 outline-none hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring">
+                  <svg class="i size-4"><use href="#i-chevron-down"/></svg>
+                </button>
+              </li>
+            </template>
+            <li class="flex items-center">
+              <span x-show="!isClient" aria-hidden="true" class="mx-2 h-5 w-px bg-sidebar-foreground/20"></span>
+              <a href="client-space.html" class="relative flex items-center gap-2 rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-sidebar-foreground/80 outline-none transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground">
+                <svg class="i size-4 text-sidebar-foreground/60"><use href="#i-building-2"/></svg>
+                Client Space
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Sélecteur de projet (menu en haut) -->
+        <div x-show="projMenu.open" x-cloak @click.outside="projMenu.open = false" role="menu"
+             :style="`position: fixed; top: ${projMenu.y}px; left: ${projMenu.x}px`"
+             class="z-50 max-h-[70dvh] w-72 overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+          <template x-for="g in projectGroups" :key="g.id">
+            <div>
+              <button type="button" @click.stop="toggleGroup(g)" :aria-expanded="isOpen(g)" class="flex w-full cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase hover:bg-accent">
+                <svg class="i size-3 transition-transform" :class="isOpen(g) ? '' : '-rotate-90'"><use href="#i-chevron-down"/></svg>
+                <span class="flex-1 text-left"><span x-text="g.label"></span> <span x-show="g.hint" class="text-[9px] font-normal normal-case italic" x-text="'(' + g.hint + ')'"></span></span>
+                <span class="font-mono text-[10px] normal-case" x-text="g.items.length"></span>
+              </button>
+              <div x-show="isOpen(g)" class="mb-1">
+                <template x-for="p in g.items" :key="p.id">
+                  <a :href="'project-detail.html?id=' + p.id" role="menuitem" :aria-current="p.id === currentProjectId ? 'page' : null" class="menu-item" :class="p.id === currentProjectId ? 'bg-accent font-medium' : ''">
+                    <span class="font-mono text-[10px] text-muted-foreground" x-text="p.code.replace('MSR-', '')"></span>
+                    <span class="truncate" x-text="p.name"></span>
+                  </a>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </header>
+
+      <!-- ============ Contenu ============ -->
+      <main class="flex-1 px-4 py-6 md:px-8 md:py-8" :class="layout === 'top' ? 'mx-auto w-full max-w-[110rem]' : ''">
+
+        <!-- Zone restreinte (rôle Client) -->
+        <div x-show="isClient" x-cloak class="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
+          <span class="grid size-12 place-items-center rounded-full bg-muted"><svg class="i size-5 text-muted-foreground"><use href="#i-lock"/></svg></span>
+          <h1 class="text-lg font-semibold">Restricted area</h1>
+          <p class="text-sm text-muted-foreground">Client accounts only have access to the Client Space. Switch roles from the profile menu to explore internal views.</p>
+          <a href="client-space.html" class="btn btn-primary">Go to Client Space</a>
+        </div>
+
+        <!-- ================= TEAM SCHEDULE ================= -->
+        <!-- Accès réservé -->
+        <div x-show="!isClient && !canSeePage" x-cloak class="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
+          <span class="grid size-12 place-items-center rounded-full bg-muted"><svg class="i size-5 text-muted-foreground"><use href="#i-lock"/></svg></span>
+          <h1 class="text-lg font-semibold">Managers and administrators only</h1>
+          <p class="text-sm text-muted-foreground">This page is not available for your current role. Switch roles from the profile menu to view it.</p>
+        </div>
+
+        <div x-show="!isClient && canSeePage" class="mx-auto max-w-[1600px]">
+
+          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div class="min-w-0">
+              <h1 class="text-2xl font-semibold tracking-tight text-balance">Team Schedule</h1>
+              <p class="mt-1 max-w-2xl text-sm text-muted-foreground text-pretty" x-text="pageDescription"></p>
+            </div>
+          </div>
+
+          <!-- Barre d'outils -->
+          <div class="mb-4 flex flex-wrap items-center gap-2">
+            <div role="group" aria-label="Schedule view" class="inline-flex h-8 items-center rounded-lg border bg-card p-0.5">
+              <button type="button" :aria-pressed="view === 'timeline'" aria-label="Timeline" @click="view = 'timeline'"
+                      class="inline-flex h-full items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+                      :class="view === 'timeline' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'">
+                <svg class="i size-4"><use href="#i-chart-gantt"/></svg><span class="hidden sm:inline">Timeline</span>
+              </button>
+              <button type="button" :aria-pressed="view === 'list'" aria-label="List" @click="view = 'list'"
+                      class="inline-flex h-full items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+                      :class="view === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'">
+                <svg class="i size-4"><use href="#i-list"/></svg><span class="hidden sm:inline">List</span>
+              </button>
+            </div>
+            <select x-model="filter" aria-label="Filter by project" class="select h-8 w-64">
+              <template x-for="o in filterOptions" :key="o.value"><option :value="o.value" x-text="o.label"></option></template>
+            </select>
+            <p class="ml-auto text-xs text-muted-foreground"
+               x-text="sched.count + ' assignment' + (sched.count === 1 ? '' : 's') + (sched.people > 1 ? ' · ' + sched.current + ' of ' + sched.people + ' people currently assigned' : '')"></p>
+          </div>
+
+          <!-- Aucune affectation -->
+          <div x-show="sched.count === 0" x-cloak class="rounded-lg border border-dashed bg-card/50 px-6 py-12 text-center">
+            <p class="text-sm font-medium">No assignments for this selection</p>
+            <p class="mt-1 text-sm text-muted-foreground">Try another project filter.</p>
+          </div>
+
+          <!-- ======== Chronologie ======== -->
+          <div x-show="sched.count > 0 && view === 'timeline'" class="card gap-0 overflow-hidden p-0">
+            <div class="overflow-x-auto">
+              <div :style="`min-width: ${(sched.minWidth || 720) + 240}px`">
+                <div class="flex border-b bg-muted/40">
+                  <div class="sticky left-0 z-10 w-60 shrink-0 border-r bg-muted px-4 py-2.5 text-xs font-medium text-muted-foreground">Team member</div>
+                  <div class="relative h-10 flex-1">
+                    <template x-for="m in (sched.months || [])" :key="m.label">
+                      <div class="absolute inset-y-0 flex items-center border-l px-2 font-mono text-xs text-muted-foreground" :style="`left: ${m.left}%`" x-text="m.label"></div>
+                    </template>
+                  </div>
+                </div>
+
+                <template x-for="r in (sched.tl || [])" :key="r.member.id">
+                  <div class="flex border-b last:border-b-0">
+                    <div class="sticky left-0 z-10 flex w-60 shrink-0 items-center gap-3 border-r bg-card px-4 py-2.5">
+                      <span class="relative flex size-8 shrink-0 rounded-full select-none"><span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="color(r.member.id)" x-text="r.member.initials"></span></span>
+                      <div class="min-w-0">
+                        <p class="truncate text-sm font-medium" x-text="r.member.name"></p>
+                        <p class="truncate text-[11px] text-muted-foreground" x-text="r.member.title"></p>
+                        <p class="text-[11px] font-medium" :class="r.now ? 'text-success-ink' : 'text-muted-foreground'" x-text="r.status"></p>
+                      </div>
+                    </div>
+                    <div class="relative flex-1" :style="`height: ${r.height}px`">
+                      <template x-for="m in sched.months" :key="m.label"><div aria-hidden="true" class="absolute inset-y-0 border-l border-dashed border-border/70" :style="`left: ${m.left}%`"></div></template>
+                      <div aria-hidden="true" class="absolute inset-y-0 z-[1] w-0.5 bg-destructive/70" :style="`left: ${sched.todayPct}%`"></div>
+                      <span x-show="r.bars.length === 0" class="absolute inset-y-0 left-3 flex items-center text-xs text-muted-foreground">No assignment</span>
+                      <template x-for="b in r.bars" :key="b.key">
+                        <a :href="'project-detail.html?id=' + b.p.id" :title="b.title" :aria-label="b.aria"
+                           class="absolute z-[2] flex h-6 items-center overflow-hidden rounded-md px-2 font-mono text-[10px] font-semibold text-white ring-1 ring-foreground/10 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                           :style="`left: ${b.left}%; width: ${b.width}%; top: ${b.top}px; background: ${b.bg}; text-shadow: 0 0 3px rgb(0 0 0 / 0.45)`">
+                          <span class="truncate" x-text="b.p.code"></span>
+                        </a>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t px-4 py-2.5 text-xs text-muted-foreground">
+              <span class="inline-flex items-center gap-1.5"><span class="h-3 w-0.5 bg-destructive"></span> Today (<span x-text="fd(TODAY)"></span>)</span>
+              <template x-for="p in (sched.legend || [])" :key="p.id">
+                <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" :style="`background: ${colorOf(p.id)}`"></span> <span x-text="p.code"></span></span>
+              </template>
+              <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background: repeating-linear-gradient(135deg, var(--muted-foreground) 0 3px, transparent 3px 6px)"></span> Assigned, no task yet</span>
+            </div>
+          </div>
+
+          <!-- ======== Liste ======== -->
+          <div x-show="sched.count > 0 && view === 'list'" x-cloak class="card gap-0 overflow-hidden p-0">
+            <div class="relative w-full overflow-x-auto">
+              <table class="w-full caption-bottom text-sm">
+                <thead class="[&_tr]:border-b">
+                  <tr class="border-b bg-muted/40 transition-colors hover:bg-muted/40">
+                    <th class="h-10 px-4 text-left align-middle font-medium whitespace-nowrap text-foreground">Team member</th>
+                    <th class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground">Project</th>
+                    <th class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground">Period</th>
+                    <th class="h-10 px-2 text-right align-middle font-medium whitespace-nowrap text-foreground">Tasks</th>
+                    <th class="h-10 px-2 pr-4 text-left align-middle font-medium whitespace-nowrap text-foreground">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="[&_tr:last-child]:border-0">
+                  <template x-for="a in (sched.flat || [])" :key="a.memberId + a.projectId">
+                    <tr class="border-b transition-colors hover:bg-muted/50">
+                      <td class="p-2 px-4 align-middle whitespace-nowrap">
+                        <span class="inline-flex items-center gap-2">
+                          <span class="relative flex size-6 shrink-0 rounded-full select-none"><span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="color(a.member.id)" x-text="a.member.initials"></span></span>
+                          <span>
+                            <span class="block text-sm font-medium" x-text="a.member.name"></span>
+                            <span class="block text-xs text-muted-foreground" x-text="a.member.title"></span>
+                          </span>
+                        </span>
+                      </td>
+                      <td class="p-2 align-middle whitespace-nowrap">
+                        <a :href="'project-detail.html?id=' + a.p.id" class="inline-flex items-center gap-2 font-medium hover:text-primary hover:underline">
+                          <span aria-hidden="true" class="size-2.5 rounded-sm" :style="`background: ${colorOf(a.p.id)}`"></span>
+                          <span x-text="a.p.name"></span>
+                        </a>
+                        <span class="block font-mono text-[11px] text-muted-foreground" x-text="a.p.code"></span>
+                      </td>
+                      <td class="p-2 align-middle text-sm whitespace-nowrap">
+                        <span x-text="fd(a.start, 'D MMM YYYY') + ' → ' + fd(a.end, 'D MMM YYYY')"></span>
+                        <span x-show="!a.fromTasks" class="block text-[11px] text-muted-foreground">Project period (no task assigned yet)</span>
+                      </td>
+                      <td class="p-2 text-right align-middle whitespace-nowrap tabular-nums" x-text="a.tasks"></td>
+                      <td class="p-2 pr-4 align-middle whitespace-nowrap">
+                        <span class="badge badge-outline font-medium" :class="PHASE_TONE[a.ph]" x-text="a.ph"></span>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ============ Dialogue « Create project » ============ -->
+  <div x-show="createOpen" x-cloak class="fixed inset-0 z-[60]" role="presentation">
+    <div x-show="createOpen" x-transition.opacity.duration.100ms @click="createOpen = false" class="fixed inset-0 bg-black/10 backdrop-blur-xs"></div>
+    <div x-show="createOpen" x-transition.opacity.scale.95.duration.120ms role="dialog" aria-modal="true" aria-labelledby="cp-title"
+         class="fixed top-1/2 left-1/2 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 sm:max-w-lg">
+      <form class="flex flex-col gap-4" @submit.prevent="submitProject()">
+        <div class="flex flex-col gap-2">
+          <h2 id="cp-title" class="text-base leading-none font-medium">Create project</h2>
+          <p class="text-sm text-muted-foreground">Set up a new engineering project. You can invite the team afterwards.</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="p-name" class="label-text">Project name</label>
+            <input id="p-name" x-ref="pname" x-model="form.name" class="input" placeholder="e.g. Wind Farm Grid Connection" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-client" class="label-text">Client</label>
+            <input id="p-client" x-model="form.client" class="input" placeholder="Client company" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-priority" class="label-text">Priority</label>
+            <select id="p-priority" x-model="form.priority" class="select">
+              <option>High</option><option>Medium</option><option>Low</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-start" class="label-text">Start date</label>
+            <input id="p-start" type="date" x-model="form.startDate" class="input" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-end" class="label-text">Target end date</label>
+            <input id="p-end" type="date" x-model="form.endDate" :min="form.startDate" class="input" required>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-tags" class="label-text">Tags</label>
+            <input id="p-tags" x-model="form.tags" class="input" placeholder="Structural, HVAC">
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="p-budget" class="label-text">Budget (EUR)</label>
+            <input id="p-budget" type="number" min="0" inputmode="numeric" x-model="form.budget" class="input" placeholder="250000">
+          </div>
+          <div class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="p-desc" class="label-text">Description</label>
+            <textarea id="p-desc" rows="3" x-model="form.description" class="textarea" placeholder="Scope summary"></textarea>
+          </div>
+        </div>
+        <div class="-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end">
+          <button type="button" class="btn btn-outline" @click="createOpen = false">Cancel</button>
+          <button type="submit" class="btn btn-primary" :disabled="!validForm">Create project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

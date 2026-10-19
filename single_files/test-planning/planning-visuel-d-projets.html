@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4f4c4d">
+  <title>Concept D · Staffing by project · Half-day planning</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e63641'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Préférences d'affichage (thème, palette, taille, position du menu) partagées entre les pages -->
+  <script>
+    try {
+      var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
+      if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
+      if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
+      if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+      if (p.navLayout && p.navLayout !== 'side') e.setAttribute('data-nav', p.navLayout);
+    } catch (_) {}
+  </script>
+
+  <!-- ===================================================================
+       1) Tokens de couleur Maser Engineering (CSS natif, clair / sombre)
+       =================================================================== -->
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f6f6f6, #1c1b1b);
+      --foreground: light-dark(#2b2929, #f6f6f6);
+      --card: light-dark(#ffffff, #272525);
+      --card-foreground: var(--foreground);
+      --popover: var(--card);
+      --popover-foreground: var(--foreground);
+      --primary: #e63641;
+      --primary-foreground: #ffffff;
+      --alt: light-dark(#4f4c4d, #b5b2b3);
+      --secondary: light-dark(#f6f6f6, #333031);
+      --secondary-foreground: var(--alt);
+      --muted: light-dark(#f6f6f6, #333031);
+      --muted-foreground: light-dark(#6f6c6d, #aaa7a8);
+      --accent: light-dark(#f6f6f6, #333031);
+      --accent-foreground: var(--foreground);
+      --success: oklch(0.6 0.13 163);
+      --success-foreground: #ffffff;
+      --warning: oklch(0.75 0.15 70);
+      --warning-foreground: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive: oklch(0.58 0.22 27);
+      --border: light-dark(#e6e5e5, #3d3a3b);
+      --input: light-dark(#e6e5e5, #3d3a3b);
+      --ring: #e63641;
+      --chart-1: #e63641;
+      --chart-2: oklch(0.6 0.13 163);
+      --chart-3: oklch(0.75 0.15 70);
+      --chart-4: oklch(0.58 0.22 27);
+      --chart-5: oklch(0.6 0.1 240);
+      /* textes de badges : teinte mélangée au texte */
+      --alt-ink: color-mix(in oklch, var(--alt) 65%, var(--foreground));
+      --success-ink: color-mix(in oklch, var(--success) 65%, var(--foreground));
+      --warning-ink: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive-ink: color-mix(in oklch, var(--destructive) 65%, var(--foreground));
+      --chart-5-ink: color-mix(in oklch, var(--chart-5) 65%, var(--foreground));
+      --muted-ink: color-mix(in oklch, var(--muted-foreground) 65%, var(--foreground));
+      --sidebar: #4f4c4d;
+      --sidebar-foreground: #f6f6f6;
+      --sidebar-primary: #e63641;
+      --sidebar-primary-foreground: #ffffff;
+      --sidebar-accent: #625f60;
+      --sidebar-accent-foreground: #ffffff;
+      --sidebar-border: #625f60;
+      --sidebar-ring: #e63641;
+      --radius: 0.5rem;
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"]  { color-scheme: dark; }
+
+    /* Palettes alternatives (Settings > Appearance) */
+    :root[data-palette="ocean"]   { --background: light-dark(#f4f6f9, #121820); --foreground: light-dark(#1b2430, #f1f5f9); --card: light-dark(#fff, #1b232d); --primary: #2f6fe4; --alt: light-dark(#475569, #cbd5e1); --secondary: light-dark(#eef1f6, #263040); --muted: light-dark(#eef1f6, #263040); --muted-foreground: light-dark(#64748b, #94a3b8); --accent: light-dark(#eef1f6, #263040); --border: light-dark(#dde3ec, #334155); --input: light-dark(#dde3ec, #334155); --ring: #2f6fe4; --chart-1: #2f6fe4; --sidebar: #1e293b; --sidebar-foreground: #e2e8f0; --sidebar-primary: #4f8df5; --sidebar-accent: #334155; --sidebar-border: #334155; --sidebar-ring: #4f8df5; }
+    :root[data-palette="forest"]  { --background: light-dark(#f5f6f3, #141a16); --foreground: light-dark(#232a25, #f3f6f3); --card: light-dark(#fff, #1e2520); --primary: #1f8a5b; --alt: light-dark(#4a5a50, #bccbc2); --secondary: light-dark(#eef1ec, #2a332d); --muted: light-dark(#eef1ec, #2a332d); --muted-foreground: light-dark(#6b7770, #9aa8a0); --accent: light-dark(#eef1ec, #2a332d); --border: light-dark(#e0e5de, #36413a); --input: light-dark(#e0e5de, #36413a); --ring: #1f8a5b; --chart-1: #1f8a5b; --sidebar: #24332b; --sidebar-foreground: #e8f0ea; --sidebar-primary: #3cb782; --sidebar-accent: #34473c; --sidebar-border: #34473c; --sidebar-ring: #3cb782; }
+    :root[data-palette="sunset"]  { --background: light-dark(#f7f5f2, #1c1916); --foreground: light-dark(#2d2825, #f7f3ee); --card: light-dark(#fff, #28231f); --primary: #d9480f; --alt: light-dark(#5c5148, #d3c8bc); --secondary: light-dark(#f1ece6, #38312a); --muted: light-dark(#f1ece6, #38312a); --muted-foreground: light-dark(#7a6f66, #b2a69a); --accent: light-dark(#f1ece6, #38312a); --border: light-dark(#e8e0d7, #4a4137); --input: light-dark(#e8e0d7, #4a4137); --ring: #d9480f; --chart-1: #d9480f; --sidebar: #3b322b; --sidebar-foreground: #f4ece3; --sidebar-primary: #f0702e; --sidebar-accent: #51463c; --sidebar-border: #51463c; --sidebar-ring: #f0702e; }
+    :root[data-palette="violet"]  { --background: light-dark(#f6f5f9, #16141c); --foreground: light-dark(#272433, #f4f2fa); --card: light-dark(#fff, #211e2b); --primary: #7c3aed; --alt: light-dark(#4f4a63, #cdc9de); --secondary: light-dark(#efedf5, #2f2b3b); --muted: light-dark(#efedf5, #2f2b3b); --muted-foreground: light-dark(#6f6a80, #a39fb5); --accent: light-dark(#efedf5, #2f2b3b); --border: light-dark(#e3e0ec, #3d3850); --input: light-dark(#e3e0ec, #3d3850); --ring: #7c3aed; --chart-1: #7c3aed; --sidebar: #2e2a40; --sidebar-foreground: #ece9f6; --sidebar-primary: #9d6bf5; --sidebar-accent: #453f5e; --sidebar-border: #453f5e; --sidebar-ring: #9d6bf5; }
+    :root[data-palette="graphite"]{ --primary: light-dark(#2b2929, #f6f6f6); --primary-foreground: light-dark(#fff, #1c1b1b); --ring: light-dark(#6f6c6d, #aaa7a8); --chart-1: light-dark(#4f4c4d, #cfcdce); --sidebar: #1c1b1b; --sidebar-foreground: #d9d8d8; --sidebar-primary: #f6f6f6; --sidebar-primary-foreground: #1c1b1b; --sidebar-accent: #333031; --sidebar-border: #333031; --sidebar-ring: #aaa7a8; }
+
+    :root[data-density="compact"] { font-size: 14.5px; }
+    :root[data-density="large"]   { font-size: 17px; }
+
+    [x-cloak] { display: none !important; }
+    /* icônes Lucide (sprite SVG) */
+    .i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- ===================================================================
+       2) Tailwind CSS (CDN) + configuration du thème
+       =================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-alt: var(--alt);
+      --color-success: var(--success);
+      --color-success-foreground: var(--success-foreground);
+      --color-warning: var(--warning);
+      --color-warning-foreground: var(--warning-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --color-chart-1: var(--chart-1);
+      --color-chart-2: var(--chart-2);
+      --color-chart-3: var(--chart-3);
+      --color-chart-4: var(--chart-4);
+      --color-chart-5: var(--chart-5);
+      --color-alt-ink: var(--alt-ink);
+      --color-success-ink: var(--success-ink);
+      --color-warning-ink: var(--warning-ink);
+      --color-destructive-ink: var(--destructive-ink);
+      --color-chart-5-ink: var(--chart-5-ink);
+      --color-muted-ink: var(--muted-ink);
+      --color-sidebar: var(--sidebar);
+      --color-sidebar-foreground: var(--sidebar-foreground);
+      --color-sidebar-primary: var(--sidebar-primary);
+      --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+      --color-sidebar-accent: var(--sidebar-accent);
+      --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+      --color-sidebar-border: var(--sidebar-border);
+      --color-sidebar-ring: var(--sidebar-ring);
+
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+      --radius-3xl: calc(var(--radius) * 2.2);
+      --radius-4xl: calc(var(--radius) * 2.6);
+
+      /* Alias des noms de couleurs FlyonUI (migration future sans retouche) */
+      --color-base-100: var(--card);
+      --color-base-200: var(--background);
+      --color-base-300: var(--border);
+      --color-base-content: var(--foreground);
+      --color-error: var(--destructive);
+      --color-info: var(--chart-5);
+    }
+
+    @layer base {
+      *, ::after, ::before { border-color: var(--border); }
+      * { outline-color: color-mix(in oklab, var(--ring) 50%, transparent); }
+      body { @apply bg-background text-foreground font-sans antialiased; }
+    }
+
+    /* ---------------------------------------------------------------
+       Classes sémantiques compatibles FlyonUI (btn, input, card, badge…).
+       FlyonUI est un plugin Tailwind sans version CDN : ce bloc reproduit
+       son API de classes avec le thème Maser. Avec une étape de build
+       (npm i flyonui + @plugin "flyonui") il peut être supprimé.
+       --------------------------------------------------------------- */
+    @layer components {
+      .btn { @apply inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50; }
+      .btn svg { @apply pointer-events-none size-4 shrink-0; }
+      .btn-sm { @apply h-7 gap-1 px-2.5 text-[0.8rem]; }
+      .btn-sm svg { @apply size-3.5; }
+      .btn-lg { @apply h-10; }
+      .btn-square { @apply size-8 px-0; }
+      .btn-block { @apply w-full; }
+      .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/80; }
+      .btn-outline { @apply border-border bg-card text-foreground hover:bg-muted; }
+      .btn-text { @apply text-foreground hover:bg-muted; }
+      .input { @apply h-8 w-full min-w-0 rounded-lg border border-input bg-muted px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm; }
+      .textarea { @apply min-h-16 w-full rounded-lg border border-input bg-muted px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; }
+      .select { @apply h-8 w-full min-w-0 appearance-none rounded-lg border border-input bg-muted bg-no-repeat px-2.5 py-1 pr-8 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 0.5rem center; }
+      .label-text { @apply text-sm leading-none font-medium select-none; }
+      .card { @apply flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10; }
+      .badge { @apply inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
+      .badge-outline { @apply border-border text-foreground; }
+      .badge-secondary { @apply bg-secondary text-secondary-foreground; }
+      .menu-item { @apply flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-none select-none hover:bg-accent focus:bg-accent; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }
+  </style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/flyonui@2.4.1/flyonui.js"></script>
+  <script>
+
+    const DATA = {"members":[{"id":"u1","name":"Karim Maser","initials":"KM","role":"Admin","title":"Managing Director"},{"id":"u2","name":"Sophie Laurent","initials":"SL","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u3","name":"Julien Moreau","initials":"JM","role":"Collaborator","title":"Structural Engineer","supervisorId":"u6"},{"id":"u4","name":"Amina Benali","initials":"AB","role":"Collaborator","title":"QA Engineer","supervisorId":"u2"},{"id":"u5","name":"Lucas Petit","initials":"LP","role":"Collaborator","title":"Electrical Engineer","supervisorId":"u2"},{"id":"u6","name":"Nora Haddad","initials":"NH","role":"Manager","title":"Project Manager","supervisorId":"u1"},{"id":"u7","name":"Marc Fontaine","initials":"MF","role":"Client","title":"Operations Director"}],"projects":[{"id":"p1","code":"MSR-2401","name":"Solar Farm Substation Upgrade","status":"In Progress","memberIds":["u2","u3","u4","u5"]},{"id":"p2","code":"MSR-2402","name":"Rail Depot Structural Retrofit","status":"In Progress","memberIds":["u6","u3","u4"]},{"id":"p3","code":"MSR-2403","name":"Water Treatment SCADA Migration","status":"In Progress","memberIds":["u2","u5","u4"]},{"id":"p4","code":"MSR-2404","name":"Logistics Hub HVAC Design","status":"In Progress","memberIds":["u6","u3"]},{"id":"p5","code":"MSR-2305","name":"Battery Storage Feasibility Study","status":"Closed","memberIds":["u2","u5"]},{"id":"p6","code":"MSR-2209","name":"Urban Footbridge Inspection","status":"Archived","memberIds":["u6","u4"]}],"tasks":[{"id":"t1","projectId":"p1","title":"Single-line diagram revision C","status":"Done","assigneeId":"u5","startDate":"2026-08-03","dueDate":"2026-08-28"},{"id":"t2","projectId":"p1","title":"Transformer foundation design","status":"Done","assigneeId":"u3","startDate":"2026-08-17","dueDate":"2026-09-18"},{"id":"t3","projectId":"p1","title":"Protection relay coordination study","status":"Review","assigneeId":"u5","startDate":"2026-09-14","dueDate":"2026-10-23"},{"id":"t4","projectId":"p1","title":"Earthing grid calculation","status":"In Progress","assigneeId":"u3","startDate":"2026-09-28","dueDate":"2026-10-30"},{"id":"t5","projectId":"p1","title":"Factory acceptance test plan","status":"In Progress","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t6","projectId":"p1","title":"Cable routing & trench layout","status":"To Do","assigneeId":"u3","startDate":"2026-10-26","dueDate":"2026-11-20"},{"id":"t7","projectId":"p1","title":"Site energisation procedure","status":"To Do","assigneeId":"u5","startDate":"2026-11-16","dueDate":"2026-12-11"},{"id":"t8","projectId":"p2","title":"Existing frame survey","status":"Done","assigneeId":"u3","startDate":"2026-07-01","dueDate":"2026-07-31"},{"id":"t9","projectId":"p2","title":"Finite element model","status":"In Progress","assigneeId":"u3","startDate":"2026-08-10","dueDate":"2026-10-30"},{"id":"t10","projectId":"p2","title":"Underpinning method statement","status":"To Do","assigneeId":"u6","startDate":"2026-11-02","dueDate":"2026-12-04"},{"id":"t11","projectId":"p2","title":"Load test procedure","status":"Review","assigneeId":"u4","startDate":"2026-09-21","dueDate":"2026-10-20"},{"id":"t12","projectId":"p3","title":"I/O list consolidation","status":"Done","assigneeId":"u5","startDate":"2026-09-07","dueDate":"2026-09-25"},{"id":"t13","projectId":"p3","title":"Redundant server configuration","status":"In Progress","assigneeId":"u5","startDate":"2026-09-28","dueDate":"2026-10-23"},{"id":"t14","projectId":"p3","title":"HMI screen migration","status":"In Progress","assigneeId":"u4","startDate":"2026-10-05","dueDate":"2026-11-06"},{"id":"t15","projectId":"p3","title":"Cutover plan — Plant B","status":"To Do","assigneeId":"u2","startDate":"2026-11-02","dueDate":"2026-11-20"},{"id":"t16","projectId":"p4","title":"Heat load calculations","status":"In Progress","assigneeId":"u3","startDate":"2026-09-21","dueDate":"2026-10-30"},{"id":"t17","projectId":"p4","title":"Ductwork concept layout","status":"To Do","assigneeId":"u3","startDate":"2026-11-02","dueDate":"2026-12-18"},{"id":"t18","projectId":"p5","title":"Final feasibility report","status":"Done","assigneeId":"u2","startDate":"2026-05-04","dueDate":"2026-06-26"},{"id":"t19","projectId":"p6","title":"Inspection report","status":"Done","assigneeId":"u4","startDate":"2025-12-01","dueDate":"2026-02-20"}]};
+    const TODAY = '2026-10-16';
+    const BASE = Date.UTC(2026, 0, 1), DAYMS = 86400000;
+    // un demi-jour = un entier : 2 × (jours depuis le 1er janvier 2026) + 1 pour l'après-midi
+    const idx = (date, half) => Math.round((Date.parse(date + 'T00:00:00Z') - BASE) / DAYMS) * 2 + (half === 'PM' ? 1 : 0);
+    const dateOf = (i) => new Date(BASE + Math.floor(i / 2) * DAYMS).toISOString().slice(0, 10);
+    const halfOf = (i) => (i % 2 ? 'PM' : 'AM');
+    const addDays = (date, n) => new Date(Date.parse(date + 'T00:00:00Z') + n * DAYMS).toISOString().slice(0, 10);
+    const dow = (date) => new Date(date + 'T00:00:00Z').getUTCDay();
+    const isWeekendIdx = (i) => [0, 6].includes(dow(dateOf(i)));
+    const mondayOf = (date) => addDays(date, -((dow(date) + 6) % 7));
+    moment.updateLocale('en', { monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sept_Oct_Nov_Dec'.split('_') });
+    const fmt = (date, f = 'ddd D MMM') => moment(date).format(f);
+    const PROJECT_COLORS = ['var(--primary)', 'var(--success)', 'var(--chart-5)', 'oklch(.62 .14 70)', '#4f4c4d', 'var(--muted-foreground)'];
+    const LEAVE_BG = 'repeating-linear-gradient(135deg, color-mix(in oklch, var(--muted-foreground) 45%, transparent) 0 4px, color-mix(in oklch, var(--muted-foreground) 18%, transparent) 4px 8px)';
+    let _uid = 0; const uid = () => 'x' + (++_uid) + Math.floor(Math.random() * 9999);
+    const mix = (...o) => o.reduce((t, s) => Object.defineProperties(t, Object.getOwnPropertyDescriptors(s)), {});
+
+    // ------------------------------------------------------------ planning d'exemple (le même pour toutes les propositions)
+    function seedSlots() {
+      let n = 0;
+      const S = (person, project, d1, h1, d2, h2, extra = {}) => ({ id: 'seed' + (++n), personId: person, kind: 'work', projectId: project, taskId: null, a: idx(d1, h1), b: idx(d2, h2), status: 'planned', ...extra });
+      const L = (person, d1, h1, d2, h2, label) => ({ id: 'seed' + (++n), personId: person, kind: 'leave', label, projectId: null, taskId: null, a: idx(d1, h1), b: idx(d2, h2), status: 'planned' });
+      return [
+        S('u2', 'p1', '2026-10-12', 'AM', '2026-10-14', 'PM'), S('u2', 'p3', '2026-10-15', 'AM', '2026-10-15', 'PM'),
+        S('u2', 'p1', '2026-10-16', 'AM', '2026-10-16', 'AM'), S('u2', 'p3', '2026-10-16', 'PM', '2026-10-16', 'PM'),
+        S('u2', 'p1', '2026-10-19', 'AM', '2026-10-19', 'PM'), S('u2', 'p3', '2026-10-20', 'AM', '2026-10-22', 'PM'),
+        S('u2', 'p1', '2026-10-23', 'AM', '2026-10-23', 'PM'), S('u2', 'p1', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u2', 'p3', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        S('u3', 'p2', '2026-10-12', 'AM', '2026-10-13', 'PM'), S('u3', 'p1', '2026-10-14', 'AM', '2026-10-14', 'PM', { taskId: 't3' }),
+        S('u3', 'p4', '2026-10-15', 'AM', '2026-10-16', 'PM'), S('u3', 'p1', '2026-10-15', 'PM', '2026-10-15', 'PM'),
+        S('u3', 'p2', '2026-10-19', 'AM', '2026-10-21', 'PM'), S('u3', 'p4', '2026-10-22', 'AM', '2026-10-23', 'PM'),
+        S('u3', 'p1', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u3', 'p2', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        S('u4', 'p3', '2026-10-12', 'AM', '2026-10-12', 'PM'), S('u4', 'p2', '2026-10-13', 'AM', '2026-10-14', 'PM'),
+        S('u4', 'p1', '2026-10-15', 'AM', '2026-10-15', 'PM'), S('u4', 'p2', '2026-10-16', 'AM', '2026-10-16', 'AM'), S('u4', 'p1', '2026-10-16', 'PM', '2026-10-16', 'PM'),
+        S('u4', 'p1', '2026-10-19', 'AM', '2026-10-19', 'PM'), L('u4', '2026-10-20', 'PM', '2026-10-21', 'PM', 'Annual leave'),
+        S('u4', 'p3', '2026-10-22', 'AM', '2026-10-23', 'PM'), S('u4', 'p2', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u4', 'p1', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+        S('u5', 'p1', '2026-10-12', 'AM', '2026-10-14', 'PM'), S('u5', 'p3', '2026-10-15', 'AM', '2026-10-15', 'PM'), S('u5', 'p1', '2026-10-16', 'AM', '2026-10-16', 'AM'),
+        S('u5', 'p1', '2026-10-19', 'AM', '2026-10-21', 'PM'), S('u5', 'p3', '2026-10-22', 'AM', '2026-10-23', 'PM'),
+        S('u5', 'p1', '2026-10-26', 'AM', '2026-10-28', 'PM'), S('u5', 'p3', '2026-10-29', 'AM', '2026-10-30', 'PM'),
+        S('u6', 'p2', '2026-10-12', 'AM', '2026-10-13', 'PM'), S('u6', 'p4', '2026-10-14', 'AM', '2026-10-16', 'PM'),
+        S('u6', 'p2', '2026-10-19', 'AM', '2026-10-20', 'PM'), S('u6', 'p4', '2026-10-21', 'AM', '2026-10-23', 'PM'),
+        S('u6', 'p2', '2026-10-26', 'AM', '2026-10-27', 'PM'), S('u6', 'p4', '2026-10-28', 'AM', '2026-10-30', 'PM'),
+      ];
+    }
+    // fusionne les créneaux contigus et identiques
+    function mergeSlots(slots) {
+      const key = (s) => [s.personId, s.kind, s.projectId, s.taskId, s.status, s.label].join('|');
+      const sorted = [...slots].sort((x, y) => key(x).localeCompare(key(y)) || x.a - y.a), out = [];
+      for (const s of sorted) { const p = out[out.length - 1]; if (p && key(p) === key(s) && s.a === p.b + 1) p.b = s.b; else out.push({ ...s }); }
+      return out;
+    }
+    // pose (ou efface, si val est null) UNE demi-journée ; pred choisit les créneaux à découper (par défaut tous)
+    function setHalf(slots, personId, i, val, pred = () => true) {
+      const out = [];
+      for (const s of slots) {
+        if (s.personId !== personId || i < s.a || i > s.b || !pred(s)) { out.push(s); continue; }
+        if (s.a < i) out.push({ ...s, id: uid(), b: i - 1 });
+        if (s.b > i) out.push({ ...s, id: uid(), a: i + 1 });
+      }
+      if (val) out.push({ id: uid(), personId, kind: val.kind, projectId: val.kind === 'work' ? val.projectId : null, taskId: val.taskId || null, label: val.kind === 'leave' ? 'Annual leave' : undefined, a: i, b: i, status: 'planned' });
+      return mergeSlots(out);
+    }
+    function readPrefs() { try { return JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'); } catch (_) { return {}; } }
+
+    const PERSONAS = [
+      { id: 'admin', label: 'Admin · Karim', user: 'u1' }, { id: 'manager', label: 'Manager · Sophie', user: 'u2' },
+      { id: 'manager2', label: 'Manager · Nora', user: 'u6' }, { id: 'collab', label: 'Collaborator · Julien', user: 'u3' },
+    ];
+    // socle commun à toutes les propositions : personnes, droits, lecture d'une demi-journée, peinture
+    function base() {
+      const prefs = readPrefs();
+      return {
+        ...DATA, TODAY, PERSONAS, persona: 'manager', slots: seedSlots(),
+        theme: prefs.theme || 'system', palette: prefs.palette || 'maser',
+        setTheme() { this.savePrefs(); }, setPalette() { this.savePrefs(); },
+        savePrefs() {
+          const p = readPrefs(); p.theme = this.theme; p.palette = this.palette;
+          try { localStorage.setItem('maser-prefs-v1', JSON.stringify(p)); } catch (_) {}
+          const e = document.documentElement;
+          this.theme === 'system' ? e.removeAttribute('data-theme') : e.setAttribute('data-theme', this.theme);
+          this.palette === 'maser' ? e.removeAttribute('data-palette') : e.setAttribute('data-palette', this.palette);
+        },
+        get user() { return this.members.find((m) => m.id === this.PERSONAS.find((p) => p.id === this.persona).user); },
+        subs(id) {
+          const out = [], seen = new Set([id]), q = [id];
+          while (q.length) { const x = q.shift(); this.members.forEach((m) => { if (m.supervisorId === x && !seen.has(m.id)) { seen.add(m.id); out.push(m); q.push(m.id); } }); }
+          return out;
+        },
+        get staff() {
+          if (this.persona === 'admin') return this.members.filter((m) => m.role !== 'Client');
+          if (this.persona === 'collab') return [this.user];
+          return [this.user, ...this.subs(this.user.id)];
+        },
+        canEdit(personId) { return this.persona === 'collab' ? personId === this.user.id : this.staff.some((m) => m.id === personId); },
+        project(id) { return this.projects.find((p) => p.id === id); },
+        member(id) { return this.members.find((m) => m.id === id); },
+        colorOf(pid) { return PROJECT_COLORS[Math.max(0, this.projects.findIndex((p) => p.id === pid)) % PROJECT_COLORS.length]; },
+        avatarColor(id) { return ['bg-primary text-primary-foreground', 'bg-success text-success-foreground', 'bg-chart-5 text-primary-foreground', 'bg-[oklch(.62_.14_70)] text-white', 'bg-[#4f4c4d] text-white'][id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 5]; },
+        get activeProjects() { return this.projects.filter((p) => p.status === 'In Progress'); },
+        memberProjects(pid) { return this.activeProjects.filter((p) => p.memberIds.includes(pid)); },
+        workAt(pid, i) { return this.slots.filter((s) => s.personId === pid && s.kind === 'work' && s.a <= i && i <= s.b); },
+        leaveAt(pid, i) { return this.slots.find((s) => s.personId === pid && s.kind === 'leave' && s.a <= i && i <= s.b) || null; },
+        // état d'une demi-journée : free · work · leave · conflict
+        cell(pid, i) {
+          const w = this.workAt(pid, i), l = this.leaveAt(pid, i), projects = [...new Set(w.map((s) => s.projectId))];
+          return { work: w, leave: l, projects, state: l ? (w.length ? 'conflict' : 'leave') : projects.length > 1 ? 'conflict' : w.length ? 'work' : 'free' };
+        },
+        paint(pid, i, val, pred) { if (!this.canEdit(pid) || isWeekendIdx(i)) return; this.slots = setHalf(this.slots, pid, i, val, pred); },
+        weekDays(start, n = 5) { const out = []; for (let k = 0; k < 7 && out.length < n; k++) { const d = addDays(start, k); if (n === 5 && [0, 6].includes(dow(d))) continue; out.push({ date: d, AM: idx(d, 'AM'), PM: idx(d, 'PM'), today: d === TODAY, weekend: [0, 6].includes(dow(d)) }); } return out; },
+        halfLabel(i) { return fmt(dateOf(i), 'ddd D MMM') + ' ' + (halfOf(i) === 'AM' ? 'morning' : 'afternoon'); },
+        cellTitle(pid, i) {
+          const c = this.cell(pid, i), who = this.member(pid)?.name, when = this.halfLabel(i);
+          if (c.state === 'free') return `${who} · ${when} — free`;
+          if (c.state === 'leave') return `${who} · ${when} — ${c.leave.label || 'leave'}`;
+          return `${who} · ${when} — ${c.projects.map((p) => this.project(p).code).join(' + ')}${c.state === 'conflict' ? ' (conflict)' : ''}`;
+        },
+        // charge d'une personne sur une liste d'indices (hors week-end, hors congés)
+        load(pid, idxs) {
+          let cap = 0, used = 0;
+          idxs.forEach((i) => { if (isWeekendIdx(i)) return; const c = this.cell(pid, i); if (c.leave && !c.work.length) return; cap++; if (c.work.length) used++; });
+          return { cap, used, free: cap - used, pct: cap ? Math.round((used / cap) * 100) : 0 };
+        },
+      };
+    }
+
+    document.addEventListener('alpine:init', () => {
+
+      Alpine.data('plan', () => mix(base(), {
+        weekStart: '2026-10-12', weeks: 1, pop: { open: false, pid: '', i: 0, x: 0, y: 0 },
+        get weekList() { return Array.from({ length: this.weeks }, (_, k) => this.weekDays(addDays(this.weekStart, k * 7), 5)); },
+        get days() { return this.weekList.flat(); },
+        get halfs() { return this.days.flatMap((d) => [{ i: d.AM, day: d, half: 'AM' }, { i: d.PM, day: d, half: 'PM' }]); },
+        get rangeLabel() { const d = this.days; return fmt(d[0].date, 'D MMM') + ' – ' + fmt(d[d.length - 1].date, 'D MMM YYYY'); },
+        shift(n) { this.weekStart = addDays(this.weekStart, n * 7); this.pop.open = false; },
+        goToday() { this.weekStart = mondayOf(TODAY); },
+        peopleAt(pid, i) { return this.staff.filter((m) => this.workAt(m.id, i).some((s) => s.projectId === pid)); },
+        get rows() {
+          return this.activeProjects.map((p) => {
+            const cells = this.halfs.map((h) => { const people = this.peopleAt(p.id, h.i); return { ...h, people, n: people.length }; });
+            return { project: p, color: this.colorOf(p.id), cells, total: cells.reduce((s, c) => s + c.n, 0), gaps: cells.filter((c) => c.n === 0).length };
+          });
+        },
+        get totals() { return this.halfs.map((h) => { const used = this.staff.filter((m) => this.cell(m.id, h.i).work.length).length, avail = this.staff.filter((m) => !(this.cell(m.id, h.i).leave && !this.cell(m.id, h.i).work.length)).length; return { i: h.i, used, avail }; }); },
+        openPop(ev, pid, i) {
+          const r = ev.currentTarget.getBoundingClientRect();
+          this.pop = { open: true, pid, i, x: Math.max(8, Math.min(r.left, window.innerWidth - 316)), y: Math.min(r.bottom + 6, window.innerHeight - 360) };
+        },
+        get popRows() {
+          return this.staff.map((m) => {
+            const c = this.cell(m.id, this.pop.i), on = c.projects.includes(this.pop.pid), member = this.project(this.pop.pid)?.memberIds.includes(m.id);
+            const other = c.projects.filter((p) => p !== this.pop.pid).map((p) => this.project(p).code);
+            return { m, on, member, other: c.state === 'leave' ? ['leave'] : other, editable: this.canEdit(m.id) && member };
+          });
+        },
+        toggle(r) {
+          if (!r.editable) return;
+          if (r.on) this.paint(r.m.id, this.pop.i, null, (s) => s.projectId === this.pop.pid);
+          else this.paint(r.m.id, this.pop.i, { kind: 'work', projectId: this.pop.pid });
+        },
+        get popTitle() { return (this.project(this.pop.pid)?.code || '') + ' · ' + this.halfLabel(this.pop.i); },
+      }));
+
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="plan" @keydown.escape.window="$dispatch('esc')">
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></symbol>
+    <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  </svg>
+  <div hidden aria-hidden="true" class="bg-warning/15 text-warning-ink bg-destructive/10 text-destructive-ink text-success-ink bg-success bg-primary bg-destructive bg-destructive/5 bg-muted/60 bg-primary/5 bg-primary/10 bg-primary/20 ring-2 ring-primary ring-destructive ring-offset-1 border-primary border-destructive/50 border-dashed opacity-40 opacity-60 opacity-100 cursor-crosshair cursor-grab cursor-pointer outline-2 outline-dashed outline-primary text-primary-foreground hover:bg-muted"></div>
+  <div class="border-b bg-warning/15 px-4 py-1.5 text-center text-xs text-warning-ink"><strong>Concept D</strong> — vue par projet : qui travaille sur quoi, et les trous de couverture · prototype de test, données fictives, rien n'est enregistré.</div>
+  <header class="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-2 border-b bg-card px-4 py-2 md:px-6">
+    <a href="planning-visuels-index.html" class="btn btn-text btn-sm -ml-2"><svg class="i"><use href="#i-arrow-left"/></svg>All concepts</a>
+    <span class="hidden h-5 w-px bg-border sm:block"></span>
+    <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">M</span>
+    <span class="flex flex-col leading-none"><span class="text-sm font-semibold tracking-tight">Staffing by project</span><span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">Concept D</span></span>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <select x-model="persona" aria-label="View as" class="select h-8 w-auto min-w-44"><template x-for="p in PERSONAS" :key="p.id"><option :value="p.id" x-text="p.label"></option></template></select>
+      <select x-model="theme" @change="setTheme()" aria-label="Theme" class="select h-8 w-auto"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+      <select x-model="palette" @change="setPalette()" aria-label="Palette" class="select h-8 w-auto"><option value="maser">Maser</option><option value="ocean">Ocean</option><option value="forest">Forest</option><option value="sunset">Sunset</option><option value="violet">Violet</option><option value="graphite">Graphite</option></select>
+    </div>
+  </header>
+  <main class="mx-auto max-w-[1600px] px-4 py-6 md:px-8">
+
+    <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Staffing by project</h1>
+        <p class="mt-1 max-w-2xl text-sm text-muted-foreground">Flip the table: one row per <strong>project</strong>, and in each half-day the people working on it. Spot staffing gaps at a glance, click a cell to add or remove someone.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="inline-flex items-center gap-1">
+          <button type="button" class="btn btn-outline btn-square" aria-label="Previous" @click="shift(-1)"><svg class="i"><use href="#i-chevron-left"/></svg></button>
+          <button type="button" class="btn btn-outline" @click="goToday()">Today</button>
+          <button type="button" class="btn btn-outline btn-square" aria-label="Next" @click="shift(1)"><svg class="i"><use href="#i-chevron-right"/></svg></button>
+        </div>
+        <span class="min-w-44 text-sm font-medium" x-text="rangeLabel"></span>
+        <select x-model.number="weeks" aria-label="Weeks" class="select h-8 w-auto"><option value="1">1 week</option><option value="2">2 weeks</option></select>
+      </div>
+    </div>
+
+    <div class="card gap-0 overflow-hidden p-0">
+      <div class="overflow-x-auto">
+        <div :style="`min-width: ${240 + halfs.length * 62}px`">
+          <div class="flex border-b bg-muted/40">
+            <div class="sticky left-0 z-10 w-60 shrink-0 border-r bg-muted px-4 py-2.5 text-xs font-medium text-muted-foreground">Project</div>
+            <template x-for="d in days" :key="d.date"><div class="flex-1 border-l px-1 py-2 text-center text-xs font-medium" :class="d.today ? 'bg-destructive/10 text-destructive' : ''"><span x-text="fmt(d.date, 'ddd D')"></span><div class="mt-0.5 flex font-mono text-[9px] font-normal text-muted-foreground"><span class="flex-1">AM</span><span class="flex-1">PM</span></div></div></template>
+          </div>
+          <template x-for="r in rows" :key="r.project.id">
+            <div class="flex border-b">
+              <div class="sticky left-0 z-10 flex w-60 shrink-0 items-center gap-3 border-r bg-card px-4 py-2.5">
+                <span class="h-9 w-1.5 shrink-0 rounded-full" :style="`background: ${r.color}`"></span>
+                <div class="min-w-0 flex-1"><p class="truncate text-sm font-medium" x-text="r.project.name"></p><p class="truncate font-mono text-[11px] text-muted-foreground" x-text="r.project.code"></p></div>
+                <div class="text-right"><p class="font-mono text-sm font-semibold tabular-nums" x-text="r.total"></p><p class="text-[10px]" :class="r.gaps ? 'font-medium text-warning-ink' : 'text-muted-foreground'" x-text="r.gaps ? r.gaps + ' gaps' : 'covered'"></p></div>
+              </div>
+              <template x-for="c in r.cells" :key="c.i">
+                <button type="button" @click="openPop($event, r.project.id, c.i)" :aria-label="r.project.code + ' · ' + halfLabel(c.i) + ' · ' + c.n + ' people'"
+                        class="flex min-h-14 flex-1 cursor-pointer flex-wrap content-center items-center justify-center gap-0.5 border-l p-1 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                        :class="c.day.today ? 'bg-destructive/5' : ''" :style="c.n ? `background: color-mix(in oklch, ${r.color} ${Math.min(c.n * 12, 40)}%, transparent)` : ''">
+                  <template x-for="m in c.people.slice(0, 3)" :key="m.id"><span class="grid size-[22px] place-items-center rounded-full text-[9px] font-semibold ring-2 ring-card" :class="avatarColor(m.id)" :title="m.name" x-text="m.initials"></span></template>
+                  <span x-show="c.n > 3" class="font-mono text-[10px] text-muted-foreground" x-text="'+' + (c.n - 3)"></span>
+                  <span x-show="c.n === 0" class="text-[10px] text-muted-foreground/60">—</span>
+                </button>
+              </template>
+            </div>
+          </template>
+          <div class="flex bg-muted/30">
+            <div class="sticky left-0 z-10 flex w-60 shrink-0 items-center border-r bg-muted px-4 py-2 text-[11px] font-medium text-muted-foreground">People planned / available</div>
+            <template x-for="t in totals" :key="t.i"><div class="flex-1 border-l py-2 text-center font-mono text-[11px]" :class="t.used > t.avail ? 'font-semibold text-destructive' : t.used < t.avail ? 'text-muted-foreground' : 'text-success-ink'" x-text="t.used + '/' + t.avail"></div></template>
+          </div>
+        </div>
+      </div>
+      <p class="border-t px-4 py-2.5 text-xs text-muted-foreground">Cell colour intensity = number of people. “gaps” = half-days of the window with nobody on the project.</p>
+    </div>
+
+    <div x-show="pop.open" x-cloak @click.outside="pop.open = false" @esc.window="pop.open = false" role="dialog" :aria-label="popTitle"
+         :style="`position: fixed; left: ${pop.x}px; top: ${pop.y}px`" class="z-50 w-72 rounded-xl bg-popover p-2 text-popover-foreground shadow-lg ring-1 ring-foreground/10">
+      <p class="px-2 py-1.5 text-xs font-medium text-muted-foreground" x-text="popTitle"></p>
+      <template x-for="r in popRows" :key="r.m.id">
+        <button type="button" @click="toggle(r)" :disabled="!r.editable" class="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50" :class="r.editable ? 'cursor-pointer hover:bg-accent' : ''">
+          <span class="grid size-6 shrink-0 place-items-center rounded-full text-[9px] font-semibold" :class="avatarColor(r.m.id)" x-text="r.m.initials"></span>
+          <span class="min-w-0 flex-1"><span class="block truncate font-medium" x-text="r.m.name"></span><span class="block truncate text-[11px] text-muted-foreground" x-text="!r.member ? 'not a project member' : r.other.length ? 'also on ' + r.other.join(', ') : 'free'"></span></span>
+          <span class="grid size-5 place-items-center rounded border" :class="r.on ? 'border-primary bg-primary text-primary-foreground' : ''"><svg x-show="r.on" class="i size-3.5"><use href="#i-check"/></svg></span>
+        </button>
+      </template>
+      <p class="px-2 pt-1 pb-1.5 text-[11px] text-muted-foreground">Adding someone who already works on another project moves them here for this half-day.</p>
+    </div>
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4f4c4d">
+  <title>Half-day planning · All concepts</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e63641'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Préférences d'affichage (thème, palette, taille, position du menu) partagées entre les pages -->
+  <script>
+    try {
+      var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
+      if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
+      if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
+      if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+      if (p.navLayout && p.navLayout !== 'side') e.setAttribute('data-nav', p.navLayout);
+    } catch (_) {}
+  </script>
+
+  <!-- ===================================================================
+       1) Tokens de couleur Maser Engineering (CSS natif, clair / sombre)
+       =================================================================== -->
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#f6f6f6, #1c1b1b);
+      --foreground: light-dark(#2b2929, #f6f6f6);
+      --card: light-dark(#ffffff, #272525);
+      --card-foreground: var(--foreground);
+      --popover: var(--card);
+      --popover-foreground: var(--foreground);
+      --primary: #e63641;
+      --primary-foreground: #ffffff;
+      --alt: light-dark(#4f4c4d, #b5b2b3);
+      --secondary: light-dark(#f6f6f6, #333031);
+      --secondary-foreground: var(--alt);
+      --muted: light-dark(#f6f6f6, #333031);
+      --muted-foreground: light-dark(#6f6c6d, #aaa7a8);
+      --accent: light-dark(#f6f6f6, #333031);
+      --accent-foreground: var(--foreground);
+      --success: oklch(0.6 0.13 163);
+      --success-foreground: #ffffff;
+      --warning: oklch(0.75 0.15 70);
+      --warning-foreground: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive: oklch(0.58 0.22 27);
+      --border: light-dark(#e6e5e5, #3d3a3b);
+      --input: light-dark(#e6e5e5, #3d3a3b);
+      --ring: #e63641;
+      --chart-1: #e63641;
+      --chart-2: oklch(0.6 0.13 163);
+      --chart-3: oklch(0.75 0.15 70);
+      --chart-4: oklch(0.58 0.22 27);
+      --chart-5: oklch(0.6 0.1 240);
+      /* textes de badges : teinte mélangée au texte */
+      --alt-ink: color-mix(in oklch, var(--alt) 65%, var(--foreground));
+      --success-ink: color-mix(in oklch, var(--success) 65%, var(--foreground));
+      --warning-ink: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+      --destructive-ink: color-mix(in oklch, var(--destructive) 65%, var(--foreground));
+      --chart-5-ink: color-mix(in oklch, var(--chart-5) 65%, var(--foreground));
+      --muted-ink: color-mix(in oklch, var(--muted-foreground) 65%, var(--foreground));
+      --sidebar: #4f4c4d;
+      --sidebar-foreground: #f6f6f6;
+      --sidebar-primary: #e63641;
+      --sidebar-primary-foreground: #ffffff;
+      --sidebar-accent: #625f60;
+      --sidebar-accent-foreground: #ffffff;
+      --sidebar-border: #625f60;
+      --sidebar-ring: #e63641;
+      --radius: 0.5rem;
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"]  { color-scheme: dark; }
+
+    /* Palettes alternatives (Settings > Appearance) */
+    :root[data-palette="ocean"]   { --background: light-dark(#f4f6f9, #121820); --foreground: light-dark(#1b2430, #f1f5f9); --card: light-dark(#fff, #1b232d); --primary: #2f6fe4; --alt: light-dark(#475569, #cbd5e1); --secondary: light-dark(#eef1f6, #263040); --muted: light-dark(#eef1f6, #263040); --muted-foreground: light-dark(#64748b, #94a3b8); --accent: light-dark(#eef1f6, #263040); --border: light-dark(#dde3ec, #334155); --input: light-dark(#dde3ec, #334155); --ring: #2f6fe4; --chart-1: #2f6fe4; --sidebar: #1e293b; --sidebar-foreground: #e2e8f0; --sidebar-primary: #4f8df5; --sidebar-accent: #334155; --sidebar-border: #334155; --sidebar-ring: #4f8df5; }
+    :root[data-palette="forest"]  { --background: light-dark(#f5f6f3, #141a16); --foreground: light-dark(#232a25, #f3f6f3); --card: light-dark(#fff, #1e2520); --primary: #1f8a5b; --alt: light-dark(#4a5a50, #bccbc2); --secondary: light-dark(#eef1ec, #2a332d); --muted: light-dark(#eef1ec, #2a332d); --muted-foreground: light-dark(#6b7770, #9aa8a0); --accent: light-dark(#eef1ec, #2a332d); --border: light-dark(#e0e5de, #36413a); --input: light-dark(#e0e5de, #36413a); --ring: #1f8a5b; --chart-1: #1f8a5b; --sidebar: #24332b; --sidebar-foreground: #e8f0ea; --sidebar-primary: #3cb782; --sidebar-accent: #34473c; --sidebar-border: #34473c; --sidebar-ring: #3cb782; }
+    :root[data-palette="sunset"]  { --background: light-dark(#f7f5f2, #1c1916); --foreground: light-dark(#2d2825, #f7f3ee); --card: light-dark(#fff, #28231f); --primary: #d9480f; --alt: light-dark(#5c5148, #d3c8bc); --secondary: light-dark(#f1ece6, #38312a); --muted: light-dark(#f1ece6, #38312a); --muted-foreground: light-dark(#7a6f66, #b2a69a); --accent: light-dark(#f1ece6, #38312a); --border: light-dark(#e8e0d7, #4a4137); --input: light-dark(#e8e0d7, #4a4137); --ring: #d9480f; --chart-1: #d9480f; --sidebar: #3b322b; --sidebar-foreground: #f4ece3; --sidebar-primary: #f0702e; --sidebar-accent: #51463c; --sidebar-border: #51463c; --sidebar-ring: #f0702e; }
+    :root[data-palette="violet"]  { --background: light-dark(#f6f5f9, #16141c); --foreground: light-dark(#272433, #f4f2fa); --card: light-dark(#fff, #211e2b); --primary: #7c3aed; --alt: light-dark(#4f4a63, #cdc9de); --secondary: light-dark(#efedf5, #2f2b3b); --muted: light-dark(#efedf5, #2f2b3b); --muted-foreground: light-dark(#6f6a80, #a39fb5); --accent: light-dark(#efedf5, #2f2b3b); --border: light-dark(#e3e0ec, #3d3850); --input: light-dark(#e3e0ec, #3d3850); --ring: #7c3aed; --chart-1: #7c3aed; --sidebar: #2e2a40; --sidebar-foreground: #ece9f6; --sidebar-primary: #9d6bf5; --sidebar-accent: #453f5e; --sidebar-border: #453f5e; --sidebar-ring: #9d6bf5; }
+    :root[data-palette="graphite"]{ --primary: light-dark(#2b2929, #f6f6f6); --primary-foreground: light-dark(#fff, #1c1b1b); --ring: light-dark(#6f6c6d, #aaa7a8); --chart-1: light-dark(#4f4c4d, #cfcdce); --sidebar: #1c1b1b; --sidebar-foreground: #d9d8d8; --sidebar-primary: #f6f6f6; --sidebar-primary-foreground: #1c1b1b; --sidebar-accent: #333031; --sidebar-border: #333031; --sidebar-ring: #aaa7a8; }
+
+    :root[data-density="compact"] { font-size: 14.5px; }
+    :root[data-density="large"]   { font-size: 17px; }
+
+    [x-cloak] { display: none !important; }
+    /* icônes Lucide (sprite SVG) */
+    .i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- ===================================================================
+       2) Tailwind CSS (CDN) + configuration du thème
+       =================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-alt: var(--alt);
+      --color-success: var(--success);
+      --color-success-foreground: var(--success-foreground);
+      --color-warning: var(--warning);
+      --color-warning-foreground: var(--warning-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --color-chart-1: var(--chart-1);
+      --color-chart-2: var(--chart-2);
+      --color-chart-3: var(--chart-3);
+      --color-chart-4: var(--chart-4);
+      --color-chart-5: var(--chart-5);
+      --color-alt-ink: var(--alt-ink);
+      --color-success-ink: var(--success-ink);
+      --color-warning-ink: var(--warning-ink);
+      --color-destructive-ink: var(--destructive-ink);
+      --color-chart-5-ink: var(--chart-5-ink);
+      --color-muted-ink: var(--muted-ink);
+      --color-sidebar: var(--sidebar);
+      --color-sidebar-foreground: var(--sidebar-foreground);
+      --color-sidebar-primary: var(--sidebar-primary);
+      --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+      --color-sidebar-accent: var(--sidebar-accent);
+      --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+      --color-sidebar-border: var(--sidebar-border);
+      --color-sidebar-ring: var(--sidebar-ring);
+
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+      --radius-3xl: calc(var(--radius) * 2.2);
+      --radius-4xl: calc(var(--radius) * 2.6);
+
+      /* Alias des noms de couleurs FlyonUI (migration future sans retouche) */
+      --color-base-100: var(--card);
+      --color-base-200: var(--background);
+      --color-base-300: var(--border);
+      --color-base-content: var(--foreground);
+      --color-error: var(--destructive);
+      --color-info: var(--chart-5);
+    }
+
+    @layer base {
+      *, ::after, ::before { border-color: var(--border); }
+      * { outline-color: color-mix(in oklab, var(--ring) 50%, transparent); }
+      body { @apply bg-background text-foreground font-sans antialiased; }
+    }
+
+    /* ---------------------------------------------------------------
+       Classes sémantiques compatibles FlyonUI (btn, input, card, badge…).
+       FlyonUI est un plugin Tailwind sans version CDN : ce bloc reproduit
+       son API de classes avec le thème Maser. Avec une étape de build
+       (npm i flyonui + @plugin "flyonui") il peut être supprimé.
+       --------------------------------------------------------------- */
+    @layer components {
+      .btn { @apply inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50; }
+      .btn svg { @apply pointer-events-none size-4 shrink-0; }
+      .btn-sm { @apply h-7 gap-1 px-2.5 text-[0.8rem]; }
+      .btn-sm svg { @apply size-3.5; }
+      .btn-lg { @apply h-10; }
+      .btn-square { @apply size-8 px-0; }
+      .btn-block { @apply w-full; }
+      .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/80; }
+      .btn-outline { @apply border-border bg-card text-foreground hover:bg-muted; }
+      .btn-text { @apply text-foreground hover:bg-muted; }
+      .input { @apply h-8 w-full min-w-0 rounded-lg border border-input bg-muted px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm; }
+      .textarea { @apply min-h-16 w-full rounded-lg border border-input bg-muted px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; }
+      .select { @apply h-8 w-full min-w-0 appearance-none rounded-lg border border-input bg-muted bg-no-repeat px-2.5 py-1 pr-8 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 0.5rem center; }
+      .label-text { @apply text-sm leading-none font-medium select-none; }
+      .card { @apply flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10; }
+      .badge { @apply inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap; }
+      .badge-outline { @apply border-border text-foreground; }
+      .badge-secondary { @apply bg-secondary text-secondary-foreground; }
+      .menu-item { @apply flex w-full cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm outline-none select-none hover:bg-accent focus:bg-accent; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }
+  </style>
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('gallery', () => ({
+        theme: (() => { try { return JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}').theme || 'system'; } catch (_) { return 'system'; } })(),
+        palette: (() => { try { return JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}').palette || 'maser'; } catch (_) { return 'maser'; } })(),
+        save() {
+          let p = {}; try { p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'); } catch (_) {}
+          p.theme = this.theme; p.palette = this.palette; try { localStorage.setItem('maser-prefs-v1', JSON.stringify(p)); } catch (_) {}
+          const e = document.documentElement;
+          this.theme === 'system' ? e.removeAttribute('data-theme') : e.setAttribute('data-theme', this.theme);
+          this.palette === 'maser' ? e.removeAttribute('data-palette') : e.setAttribute('data-palette', this.palette);
+        },
+      }));
+    });
+  </script>
+</head>
+<body x-data="gallery">
+  <header class="flex min-h-14 flex-wrap items-center gap-3 border-b bg-card px-4 py-2 md:px-6">
+    <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">M</span>
+    <span class="flex flex-col leading-none"><span class="text-sm font-semibold tracking-tight">Maser Engineering</span><span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">Half-day planning · concepts</span></span>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <select x-model="theme" @change="save()" aria-label="Theme" class="select h-8 w-auto"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+      <select x-model="palette" @change="save()" aria-label="Palette" class="select h-8 w-auto"><option value="maser">Maser</option><option value="ocean">Ocean</option><option value="forest">Forest</option><option value="sunset">Sunset</option><option value="violet">Violet</option><option value="graphite">Graphite</option></select>
+    </div>
+  </header>
+  <main class="mx-auto max-w-7xl px-4 py-8 md:px-8">
+    <div class="mb-6 max-w-3xl">
+      <h1 class="text-2xl font-semibold tracking-tight">Eight ways to show half-day planning</h1>
+      <p class="mt-1 text-sm text-muted-foreground">Each concept is a standalone test page with the same sample data and the same app theme (change theme and palette above, it carries over). Open them, switch the “View as” profile, and tell me which ones you like — a mix is fine: for example one view for the team, another for My Schedule.</p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <a href="planning-demi-journee-test.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept A: Bars grid">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">A</span><h2 class="font-semibold">Bars grid</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="rounded-md border bg-card p-2"><div class="relative h-[19px] border-b border-dashed"><span class="absolute rounded-[3px]" style="left:3%;width:25%;top:5px;height:9px;background:var(--success)"></span><span class="absolute rounded-[3px]" style="left:30%;width:30%;top:5px;height:9px;background:var(--success)"></span><span class="absolute rounded-[3px]" style="left:63%;width:20%;top:5px;height:9px;background:var(--primary)"></span></div><div class="relative h-[19px] border-b border-dashed"><span class="absolute rounded-[3px]" style="left:3%;width:30%;top:5px;height:9px;background:var(--chart-5)"></span><span class="absolute rounded-[3px]" style="left:37%;width:19%;top:5px;height:9px;background:var(--primary)"></span><span class="absolute rounded-[3px]" style="left:62%;width:29%;top:5px;height:9px;background:var(--success)"></span></div><div class="relative h-[19px] border-b border-dashed"><span class="absolute rounded-[3px]" style="left:3%;width:21%;top:5px;height:9px;background:var(--success)"></span><span class="absolute rounded-[3px]" style="left:27%;width:18%;top:5px;height:9px;background:var(--chart-5)"></span><span class="absolute rounded-[3px]" style="left:49%;width:26%;top:5px;height:9px;background:var(--primary)"></span></div><div class="relative h-[19px] border-b border-dashed"><span class="absolute rounded-[3px]" style="left:3%;width:27%;top:5px;height:9px;background:var(--success)"></span><span class="absolute rounded-[3px]" style="left:34%;width:20%;top:5px;height:9px;background:var(--chart-5)"></span><span class="absolute rounded-[3px]" style="left:58%;width:30%;top:5px;height:9px;background:var(--chart-5)"></span></div></div></div>
+        <p class="text-sm text-muted-foreground">Half-day columns with merged project bars, drag to plan, conflicts, estimate from tasks.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Team overview</span><span class="badge badge-secondary rounded-md font-normal">Familiar (extends today's timeline)</span><span class="badge badge-secondary rounded-md font-normal">Zoom 1–4 weeks</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Many options on one screen; dense at 4 weeks.</p>
+      </a>
+      <a href="planning-visuel-b-calendrier.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept B: Calendar week">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">B</span><h2 class="font-semibold">Calendar week</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="grid grid-cols-5 gap-1 rounded-md border bg-card p-2"><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--primary) 22%,var(--card));border-left:3px solid var(--primary)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--primary) 22%,var(--card));border-left:3px solid var(--primary)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--success) 22%,var(--card));border-left:3px solid var(--success)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--success) 22%,var(--card));border-left:3px solid var(--success)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--primary) 22%,var(--card));border-left:3px solid var(--primary)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--chart-5) 22%,var(--card));border-left:3px solid var(--chart-5)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--success) 22%,var(--card));border-left:3px solid var(--success)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--primary) 22%,var(--card));border-left:3px solid var(--primary)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--success) 22%,var(--card));border-left:3px solid var(--success)"></span><span class="h-[34px] rounded-[4px]" style="background:color-mix(in oklch,var(--chart-5) 22%,var(--card));border-left:3px solid var(--chart-5)"></span></div></div>
+        <p class="text-sm text-muted-foreground">One person at a time, like a calendar. Large morning / afternoon blocks, click to plan.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">My Schedule</span><span class="badge badge-secondary rounded-md font-normal">Very readable</span><span class="badge badge-secondary rounded-md font-normal">Team strip below</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Only one person in focus; weak for comparing people.</p>
+      </a>
+      <a href="planning-visuel-c-heatmap.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept C: Heatmap & brush">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">C</span><h2 class="font-semibold">Heatmap & brush</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="flex flex-col gap-[3px] rounded-md border bg-card p-2.5"><div class="flex gap-[3px]"><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span></div><div class="flex gap-[3px]"><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span></div><div class="flex gap-[3px]"><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span></div><div class="flex gap-[3px]"><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--primary)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--chart-5)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px] border border-dashed border-muted-foreground/40"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span><span class="size-[9px] rounded-[2px]" style="background:var(--success)"></span></div></div></div>
+        <p class="text-sm text-muted-foreground">One square per half-day, up to 6 weeks. Pick a brush (project, leave, erase) and paint.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Team overview</span><span class="badge badge-secondary rounded-md font-normal">Free slots jump out</span><span class="badge badge-secondary rounded-md font-normal">Fast painting</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Needs a legend; small targets on touch.</p>
+      </a>
+      <a href="planning-visuel-d-projets.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept D: Staffing by project">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">D</span><h2 class="font-semibold">Staffing by project</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="flex flex-col gap-1 rounded-md border bg-card p-2"><div class="flex items-center gap-1"><span class="h-5 w-1 rounded-full" style="background:var(--primary)"></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 14%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 28%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 0%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 28%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 0%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 40%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--primary) 28%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span></div><div class="flex items-center gap-1"><span class="h-5 w-1 rounded-full" style="background:var(--success)"></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 14%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 40%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 0%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 28%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 40%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 0%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--success) 28%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span></div><div class="flex items-center gap-1"><span class="h-5 w-1 rounded-full" style="background:var(--chart-5)"></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 40%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 14%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 14%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 14%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 40%,transparent)"><span class="flex -space-x-1"><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span><span class="size-2.5 rounded-full bg-foreground/70 ring-1 ring-card"></span></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 28%,transparent)"><span class="flex -space-x-1"></span></span><span class="grid h-[24px] flex-1 place-items-center rounded-[3px] text-[7px] font-bold text-white" style="background:color-mix(in oklch,var(--chart-5) 14%,transparent)"><span class="flex -space-x-1"></span></span></div></div></div>
+        <p class="text-sm text-muted-foreground">Rows are projects, cells show who works on it. Staffing gaps visible; click to add or remove people.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Project managers</span><span class="badge badge-secondary rounded-md font-normal">Spot coverage gaps</span><span class="badge badge-secondary rounded-md font-normal">Answers "who is on MSR-2403?"</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Not the right view to plan one person's week.</p>
+      </a>
+      <a href="planning-visuel-e-agenda-mobile.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept E: Mobile agenda">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">E</span><h2 class="font-semibold">Mobile agenda</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="mx-auto w-24 rounded-2xl border-2 border-foreground/70 bg-muted/40 p-1.5"><div class="mb-1 flex gap-0.5"><span class="h-3 flex-1 rounded-sm border bg-card"></span><span class="h-3 flex-1 rounded-sm border bg-card"></span><span class="h-3 flex-1 rounded-sm border bg-card"></span><span class="h-3 flex-1 rounded-sm border bg-card"></span><span class="h-3 flex-1 rounded-sm border bg-card"></span></div><div class="flex flex-col gap-1"><span class="block rounded-md border bg-card p-1"><span class="mb-1 block h-1.5 w-1/2 rounded bg-muted-foreground/30"></span><span class="block h-3 rounded-[3px]" style="background:color-mix(in oklch,var(--primary) 25%,var(--card));border-left:3px solid var(--primary)"></span></span><span class="block rounded-md border bg-card p-1"><span class="mb-1 block h-1.5 w-1/2 rounded bg-muted-foreground/30"></span><span class="block h-3 rounded-[3px]" style="background:color-mix(in oklch,var(--success) 25%,var(--card));border-left:3px solid var(--success)"></span></span><span class="block rounded-md border bg-card p-1"><span class="mb-1 block h-1.5 w-1/2 rounded bg-muted-foreground/30"></span><span class="block h-3 rounded-[3px]" style="background:color-mix(in oklch,var(--chart-5) 25%,var(--card));border-left:3px solid var(--chart-5)"></span></span></div></div></div>
+        <p class="text-sm text-muted-foreground">Vertical list of days with morning and afternoon, bottom sheet to plan. Shown in a phone frame.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Phone</span><span class="badge badge-secondary rounded-md font-normal">Reads like an agenda</span><span class="badge badge-secondary rounded-md font-normal">Tap to plan</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> One week at a time; no cross-team comparison.</p>
+      </a>
+      <a href="planning-visuel-f-glisser-deposer.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept F: Drag & drop tasks">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">F</span><h2 class="font-semibold">Drag & drop tasks</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="flex gap-1.5 rounded-md border bg-card p-2"><div class="flex w-9 flex-col gap-1"><span class="block h-4 rounded-[3px] bg-card" style="border-left:3px solid var(--primary);box-shadow:0 0 0 1px var(--border)"></span><span class="block h-4 rounded-[3px] bg-card" style="border-left:3px solid var(--success);box-shadow:0 0 0 1px var(--border)"></span><span class="block h-4 rounded-[3px] bg-card" style="border-left:3px solid var(--chart-5);box-shadow:0 0 0 1px var(--border)"></span></div><div class="grid flex-1 grid-cols-5 gap-1"><span class="h-[17px] rounded-[3px] " style=""></span><span class="h-[17px] rounded-[3px] border border-dashed" style="background:color-mix(in oklch,var(--chart-5) 30%,var(--card))"></span><span class="h-[17px] rounded-[3px] " style=""></span><span class="h-[17px] rounded-[3px] border border-dashed" style="background:color-mix(in oklch,var(--success) 30%,var(--card))"></span><span class="h-[17px] rounded-[3px] border border-dashed" style=""></span><span class="h-[17px] rounded-[3px] " style=""></span><span class="h-[17px] rounded-[3px] border border-dashed" style="background:color-mix(in oklch,var(--chart-5) 30%,var(--card))"></span><span class="h-[17px] rounded-[3px] " style="background:color-mix(in oklch,var(--chart-5) 30%,var(--card))"></span><span class="h-[17px] rounded-[3px] border border-dashed" style="background:color-mix(in oklch,var(--success) 30%,var(--card))"></span><span class="h-[17px] rounded-[3px] " style="background:color-mix(in oklch,var(--primary) 30%,var(--card))"></span></div></div></div>
+        <p class="text-sm text-muted-foreground">Start from the work: drag tasks onto half-days, drag blocks to move, bin to remove.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Task-driven planning</span><span class="badge badge-secondary rounded-md font-normal">Links tasks and time</span><span class="badge badge-secondary rounded-md font-normal">Intuitive</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Needs a reliable task estimate; mouse-first.</p>
+      </a>
+      <a href="planning-visuel-g-charge.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept G: Team load">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">G</span><h2 class="font-semibold">Team load</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="relative flex h-[62px] items-end gap-0.5 rounded-md border bg-card px-2 py-1"><span class="absolute inset-x-2 top-3 border-t-2 border-dashed border-foreground/50"></span><span class="flex w-full flex-col-reverse"><span style="height:18px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:18px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:21px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:16px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:20px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:8px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:23px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:7px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:14px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:16px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:15px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:10px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:21px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:9px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:21px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:16px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:12px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:7px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:22px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:16px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:15px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:11px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:21px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:11px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:15px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:10px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:10px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:15px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:10px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:14px;background:var(--chart-5)"></span></span><span class="flex w-full flex-col-reverse"><span style="height:12px;background:var(--primary)" class="rounded-b-[2px]"></span><span style="height:18px;background:var(--chart-5)"></span></span></div></div>
+        <p class="text-sm text-muted-foreground">Stacked histogram per half-day with capacity line. Spot overload and free capacity.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Managers balancing load</span><span class="badge badge-secondary rounded-md font-normal">KPIs: average load, free half-days</span><span class="badge badge-secondary rounded-md font-normal">Click a bar for who is on it</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Read-only analysis; planning happens elsewhere.</p>
+      </a>
+      <a href="planning-visuel-h-feuille-de-temps.html" class="card group gap-3 p-4 transition-shadow hover:shadow-md hover:ring-foreground/20" aria-label="Open concept H: Spreadsheet">
+        <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-md bg-primary font-mono text-sm font-bold text-primary-foreground">H</span><h2 class="font-semibold">Spreadsheet</h2></div>
+        <div class="rounded-lg bg-muted/50 p-3"><div class="flex flex-col gap-px rounded-md border bg-card p-1.5 outline outline-2 outline-primary/60"><div class="flex gap-px"><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span></div><div class="flex gap-px"><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span></div><div class="flex gap-px"><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span></div><div class="flex gap-px"><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--success)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--muted)">·</span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--chart-5)"></span><span class="grid h-[15px] flex-1 place-items-center text-[6px] font-bold text-white" style="background:var(--primary)"></span></div></div></div>
+        <p class="text-sm text-muted-foreground">Keyboard-driven grid: number keys assign projects, shift-arrows select, fill right/down, copy week.</p>
+        <div class="flex flex-wrap gap-1.5"><span class="badge badge-secondary rounded-md font-normal">Power users</span><span class="badge badge-secondary rounded-md font-normal">Fastest data entry</span><span class="badge badge-secondary rounded-md font-normal">Copy week to next week</span></div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+          <dt class="text-muted-foreground">Readability</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Density</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Phone-friendly</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span><span class="size-2 rounded-full bg-muted"></span></dd>
+          <dt class="text-muted-foreground">Entry speed</dt><dd class="flex gap-1"><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span><span class="size-2 rounded-full bg-primary"></span></dd>
+        </dl>
+        <p class="border-t pt-2 text-xs text-muted-foreground"><span class="font-medium text-foreground">Limit:</span> Steep for occasional users; less visual.</p>
+      </a>
+    </div>
+
+    <section class="mt-10" aria-labelledby="reco">
+      <h2 id="reco" class="mb-3 text-lg font-semibold">Quick guide</h2>
+      <div class="card gap-0 overflow-hidden p-0">
+        <div class="relative w-full overflow-x-auto">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b"><tr class="border-b bg-muted/40"><th class="h-10 px-4 text-left font-medium">Need</th><th class="h-10 px-2 text-left font-medium">Good candidates</th><th class="h-10 px-2 text-left font-medium">Why</th></tr></thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr class="border-b"><td class="p-2 px-4 font-medium">Team Schedule (overview + planning)</td><td class="p-2"><span class="font-mono">A</span> · <span class="font-mono">C</span></td><td class="p-2 text-muted-foreground">Everyone side by side; A extends the existing timeline, C is denser and faster to paint.</td></tr>
+              <tr class="border-b"><td class="p-2 px-4 font-medium">My Schedule (one person)</td><td class="p-2"><span class="font-mono">B</span></td><td class="p-2 text-muted-foreground">Large blocks, easy to read and to edit, can show the agenda underneath.</td></tr>
+              <tr class="border-b"><td class="p-2 px-4 font-medium">Phone use</td><td class="p-2"><span class="font-mono">E</span></td><td class="p-2 text-muted-foreground">No horizontal scrolling; plan with a bottom sheet.</td></tr>
+              <tr class="border-b"><td class="p-2 px-4 font-medium">Plan from tasks</td><td class="p-2"><span class="font-mono">F</span></td><td class="p-2 text-muted-foreground">Ties the calendar to the work to do; needs a task estimate.</td></tr>
+              <tr class="border-b"><td class="p-2 px-4 font-medium">Fast bulk entry</td><td class="p-2"><span class="font-mono">H</span> · <span class="font-mono">C</span></td><td class="p-2 text-muted-foreground">Keyboard shortcuts and fill commands, or painting with a brush.</td></tr>
+              <tr class="border-b"><td class="p-2 px-4 font-medium">Balance workload / staffing</td><td class="p-2"><span class="font-mono">G</span> · <span class="font-mono">D</span></td><td class="p-2 text-muted-foreground">Analysis views: load vs capacity, and coverage per project. Good as secondary tabs.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="mt-3 text-xs text-muted-foreground">Prototype pages: sample data only, nothing is saved, mouse input only (except H, keyboard). A complete product would likely combine two or three of these views.</p>
+    </section>
+  </main>
+</body>
+</html>
