@@ -575,7 +575,11 @@
         sel: { rowId: null, a: null, b: null, active: false },
         dlg: { open: false, mode: 'new', id: null, personId: '', kind: 'work', projectId: '', taskId: '', d1: '', h1: 'AM', d2: '', h2: 'PM', label: '' },
         who: '', sheet: { open: false, i: 0 },
+        // axe de lecture : une ligne par employé, ou une ligne par projet
+        by: (() => { try { return localStorage.getItem('maser-team-by') === 'project' ? 'project' : 'person'; } catch (_) { return 'person'; } })(),
+        pop: { open: false, pid: '', i: 0, x: 0, y: 0 }, pmsg: '',
         init() { this.who = (this.staff[0] || {}).id || ''; },
+        setBy(v) { this.by = v; this.pop.open = false; this.pmsg = ''; try { localStorage.setItem('maser-team-by', v); } catch (_) {} },
         persist() { hdSave(this.slots); },
         saveOpts() { hdSaveOpts(this.opts); },
         hProject(id) { return this.allProjects.find((p) => p.id === id); },
@@ -734,6 +738,46 @@
         remove() { this.slots = this.slots.filter((s) => s.id !== this.dlg.id); this.persist(); this.dlg.open = false; },
         get proposedCount() { return this.slots.filter((s) => s.status === 'proposed' && this.staff.some((m) => m.id === s.personId)).length; },
         reset() { this.slots = hdSeed(); this.persist(); this.weekStart = hdMonday(TODAY); },
+
+        // ---- vision par projet : une ligne par projet, dans chaque demi-journée les personnes qui y travaillent
+        get pRows() {
+          const cols = this.cols, inWindow = (p) => this.staff.some((m) => this.slotsOf(m.id).some((s) => s.kind === 'work' && s.projectId === p.id && s.b >= cols[0].i && s.a <= cols[cols.length - 1].i));
+          const list = this.filter === 'all' ? this.allProjects.filter((p) => p.status === 'In Progress' || inWindow(p)) : this.filter === 'active' ? this.allProjects.filter((p) => p.status === 'In Progress') : this.allProjects.filter((p) => p.id === this.filter);
+          return list.map((p) => {
+            const cells = cols.map((c) => { const people = c.weekend ? [] : this.staff.filter((m) => hdCell(this.slots, m.id, c.i).projects.includes(p.id)); return { i: c.i, col: c, people, n: people.length }; });
+            return { project: p, color: this.hColor(p.id), cells, total: cells.reduce((s, c) => s + c.n, 0), gaps: cells.filter((c) => !c.col.weekend && c.n === 0).length };
+          });
+        },
+        get pTotals() {
+          return this.cols.map((c) => {
+            if (c.weekend) return { i: c.i, used: 0, avail: 0, weekend: true };
+            let used = 0, avail = 0;
+            this.staff.forEach((m) => { const x = hdCell(this.slots, m.id, c.i); if (!(x.leave && !x.work.length)) avail++; if (x.work.length) used++; });
+            return { i: c.i, used, avail, weekend: false };
+          });
+        },
+        openPop(ev, pid, i) {
+          const r = ev.currentTarget.getBoundingClientRect();
+          this.pmsg = '';
+          this.pop = { open: true, pid, i, x: Math.max(8, Math.min(r.left, window.innerWidth - 316)), y: Math.min(r.bottom + 6, window.innerHeight - 360) };
+        },
+        get popTitle() { return (this.hProject(this.pop.pid)?.code || '') + ' · ' + this.fmtHalf(this.pop.i); },
+        get popRows() {
+          const p = this.hProject(this.pop.pid);
+          return this.staff.map((m) => {
+            const c = hdCell(this.slots, m.id, this.pop.i), on = c.projects.includes(this.pop.pid), member = !!p && p.memberIds.includes(m.id);
+            return { m, on, member, leave: c.state === 'leave', others: c.projects.filter((x) => x !== this.pop.pid).map((x) => this.hProject(x).code), editable: this.canEditPerson(m.id) && member };
+          });
+        },
+        // ajouter ou retirer quelqu'un du projet pour cette demi-journée (les autres projets ne sont jamais modifiés)
+        togglePerson(r) {
+          this.pmsg = ''; if (!r.editable) return;
+          if (r.on) this.slots = hdSetHalf(this.slots, r.m.id, this.pop.i, null, (s) => s.kind === 'work' && s.projectId === this.pop.pid);
+          else if (r.leave) { this.pmsg = r.m.name.split(' ')[0] + ' is on leave that half-day.'; return; }
+          else if (r.others.length && !this.opts.allowShare) { this.pmsg = r.m.name.split(' ')[0] + ' is already on ' + r.others.join(', ') + ' (allow sharing in the options to double-book).'; return; }
+          else this.slots = hdAddHalf(this.slots, r.m.id, this.pop.i, this.pop.pid);
+          this.persist();
+        },
 
         // ---- agenda mobile (concept E) : qui fait quoi à chaque demi-journée
         get eDays() { const out = []; for (let k = 0; k < 7 && out.length < 5; k++) { const d = hdAdd(this.weekStart, k); if ([0, 6].includes(hdDow(d))) continue; out.push({ date: d, AM: hdIdx(d, 'AM'), PM: hdIdx(d, 'PM'), today: d === TODAY }); } return out; },
@@ -1145,6 +1189,9 @@
         <button type="button" class="btn btn-outline btn-square" aria-label="Next" @click="shift(1)"><svg class="i"><use href="#i-chevron-right"/></svg></button>
       </div>
                 <span class="min-w-40 px-1 text-sm font-medium" x-text="rangeLabel"></span>
+                <div role="radiogroup" aria-label="Group by" class="hidden rounded-lg border bg-card p-0.5 md:inline-flex">
+                  <template x-for="o in [{ v: 'person', l: 'By employee' }, { v: 'project', l: 'By project' }]" :key="o.v"><button type="button" role="radio" :aria-checked="by === o.v" @click="setBy(o.v)" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="by === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template>
+                </div>
                 <div class="hidden md:block"><div role="radiogroup" aria-label="Zoom" class="inline-flex rounded-lg border bg-card p-0.5"><template x-for="o in [{v:'1w',l:'1 week'},{v:'2w',l:'2 weeks'},{v:'4w',l:'4 weeks'}]" :key="o.v"><button type="button" role="radio" :aria-checked="zoom === o.v" @click="zoom = o.v" class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring" :class="zoom === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'" x-text="o.l"></button></template></div></div>
                 <label class="hidden cursor-pointer items-center gap-2 text-xs text-muted-foreground select-none md:inline-flex"><button type="button" role="switch" :aria-checked="!!(hideWeekends)" aria-label="Hide weekends" @click="hideWeekends = !hideWeekends" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50" :class="hideWeekends ? 'bg-primary' : 'bg-muted-foreground/35'"><span aria-hidden="true" class="pointer-events-none block size-4 rounded-full bg-white shadow-sm transition-transform" :class="hideWeekends ? 'translate-x-[18px]' : 'translate-x-0.5'"></span></button>Hide weekends</label>
                 <div class="ml-auto flex items-center gap-2">
@@ -1163,7 +1210,7 @@
               <div class="flex flex-wrap gap-2"><template x-for="p in grid.projects" :key="p.id"><span class="inline-flex items-center gap-2 rounded-lg border bg-card px-2.5 py-1 text-xs"><span class="size-2.5 rounded-sm" :style="`background: ${p.color}`"></span><span class="font-mono font-semibold" x-text="p.code"></span><span class="text-muted-foreground" x-text="p.half + ' ½d · ' + p.people + ' ' + (p.people > 1 ? 'people' : 'person')"></span></span></template></div>
 
               <!-- ============ grille (écrans larges) ============ -->
-              <div class="card hidden gap-0 overflow-hidden p-0 select-none md:block">
+              <div x-show="by === 'person'" class="card hidden gap-0 overflow-hidden p-0 select-none md:block">
                 <div class="overflow-x-auto">
                   <div :style="`min-width: ${grid.minWidth}px`">
                     <div class="flex border-b bg-muted/40">
@@ -1218,6 +1265,67 @@
                   <span x-show="opts.source === 'both'" class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background: repeating-linear-gradient(135deg, var(--primary) 0 3px, transparent 3px 6px)"></span> Estimated from tasks</span>
                   <span class="ml-auto hidden lg:inline">Drag across half-days to plan · click a bar to edit</span>
                 </div>
+              </div>
+
+              <!-- ============ grille par projet (écrans larges) ============ -->
+              <div x-show="by === 'project'" x-cloak class="card hidden gap-0 overflow-hidden p-0 md:block">
+                <div class="overflow-x-auto">
+                  <div :style="`min-width: ${grid.minWidth}px`">
+                    <div class="flex border-b bg-muted/40">
+                      <div class="sticky left-0 z-20 flex w-56 shrink-0 items-end border-r bg-muted px-4 pb-2 text-xs font-medium text-muted-foreground">Project</div>
+                      <div class="flex-1">
+                        <div class="flex border-b"><template x-for="dy in days" :key="dy.date"><div class="border-l px-1 py-1.5 text-center text-xs font-medium first:border-l-0" :class="dy.today ? 'bg-destructive/10 text-destructive' : dy.weekend ? 'text-muted-foreground' : ''" :style="`width: ${dy.span / nCols * 100}%`" x-text="dayLabel(dy)"></div></template></div>
+                        <div class="flex"><template x-for="c in cols" :key="c.i"><div class="border-l py-0.5 text-center font-mono text-[9px] text-muted-foreground" :class="[c.half === 'AM' ? 'border-border' : 'border-dashed border-border/60', c.today ? 'bg-destructive/5' : '']" :style="`width: ${100 / nCols}%`" x-text="zoom === '4w' ? '' : c.half"></div></template></div>
+                      </div>
+                    </div>
+                    <template x-for="r in pRows" :key="r.project.id">
+                      <div class="flex border-b last:border-b-0">
+                        <div class="sticky left-0 z-10 flex w-56 shrink-0 items-center gap-3 border-r bg-card px-4 py-2.5">
+                          <span class="h-9 w-1.5 shrink-0 rounded-full" :style="`background: ${r.color}`"></span>
+                          <div class="min-w-0 flex-1"><p class="truncate text-sm font-medium" x-text="r.project.name"></p><p class="truncate font-mono text-[11px] text-muted-foreground" x-text="r.project.code"></p></div>
+                          <div class="text-right"><p class="font-mono text-sm font-semibold tabular-nums" x-text="r.total"></p><p class="text-[10px]" :class="r.gaps ? 'font-medium text-warning-ink' : 'text-muted-foreground'" x-text="r.gaps ? r.gaps + ' gaps' : 'covered'"></p></div>
+                        </div>
+                        <div class="flex flex-1">
+                          <template x-for="c in r.cells" :key="c.i">
+                            <button type="button" @click="!c.col.weekend && openPop($event, r.project.id, c.i)" :disabled="c.col.weekend" :aria-label="r.project.code + ' · ' + fmtHalf(c.i) + ' · ' + c.n + ' people'"
+                                    class="flex min-h-14 cursor-pointer flex-wrap content-center items-center justify-center gap-0.5 border-l p-0.5 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:cursor-default"
+                                    :class="[c.col.half === 'AM' ? 'border-border' : 'border-dashed border-border/60', c.col.weekend ? 'bg-muted/60' : c.col.today ? 'bg-destructive/5' : '']"
+                                    :style="`width: ${100 / nCols}%; ` + (c.n ? `background: color-mix(in oklch, ${r.color} ${Math.min(c.n * 12, 40)}%, transparent)` : '')">
+                              <template x-if="zoom === '1w'"><span class="flex flex-wrap items-center justify-center gap-0.5">
+                                <template x-for="m in c.people.slice(0, 2)" :key="m.id"><span class="grid size-[22px] place-items-center rounded-full text-[9px] font-semibold ring-2 ring-card" :class="color(m.id)" :title="m.name" x-text="m.initials"></span></template>
+                                <span x-show="c.n > 2" class="font-mono text-[10px] text-muted-foreground" x-text="'+' + (c.n - 2)"></span>
+                                <span x-show="c.n === 0 && !c.col.weekend" class="text-[10px] text-muted-foreground/60">—</span>
+                              </span></template>
+                              <template x-if="zoom !== '1w'"><span class="font-mono text-[10px] font-semibold tabular-nums" :class="c.n ? '' : 'text-muted-foreground/50'" x-text="c.col.weekend ? '' : (c.n || '·')"></span></template>
+                            </button>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <div class="flex border-t bg-muted/30">
+                      <div class="sticky left-0 z-10 flex w-56 shrink-0 items-center border-r bg-muted px-4 py-1.5 text-[11px] font-medium text-muted-foreground">People planned / available</div>
+                      <div class="flex flex-1"><template x-for="t in pTotals" :key="t.i"><div class="border-l py-1 text-center font-mono text-[10px]" :class="t.used > t.avail ? 'font-semibold text-destructive' : 'text-muted-foreground'" :style="`width: ${100 / nCols}%`" x-text="zoom === '4w' || t.weekend ? '' : t.used + '/' + t.avail"></div></template></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t px-4 py-2.5 text-xs text-muted-foreground">
+                  <span>Each cell shows the people working on that project during the half-day. Click a cell to add or remove someone.</span>
+                  <span class="ml-auto hidden lg:inline">“gaps” = half-days of the window with nobody on the project</span>
+                </div>
+              </div>
+
+              <!-- fenêtre : ajouter / retirer une personne (vision par projet) -->
+              <div x-show="pop.open" x-cloak @click.outside="pop.open = false" role="dialog" :aria-label="popTitle" :style="`position: fixed; left: ${pop.x}px; top: ${pop.y}px`" class="z-50 w-72 rounded-xl bg-popover p-2 text-popover-foreground shadow-lg ring-1 ring-foreground/10">
+                <p class="px-2 py-1.5 text-xs font-medium text-muted-foreground" x-text="popTitle"></p>
+                <template x-for="r in popRows" :key="r.m.id">
+                  <button type="button" @click="togglePerson(r)" :disabled="!r.editable" class="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50" :class="r.editable ? 'cursor-pointer hover:bg-accent' : ''">
+                    <span class="grid size-6 shrink-0 place-items-center rounded-full text-[9px] font-semibold" :class="color(r.m.id)" x-text="r.m.initials"></span>
+                    <span class="min-w-0 flex-1"><span class="block truncate font-medium" x-text="r.m.name"></span><span class="block truncate text-[11px] text-muted-foreground" x-text="!r.member ? 'not a project member' : r.leave ? 'on leave' : r.others.length ? 'also on ' + r.others.join(', ') : r.on ? 'on this project' : 'free'"></span></span>
+                    <span class="grid size-5 place-items-center rounded border" :class="r.on ? 'border-primary bg-primary text-primary-foreground' : ''"><svg x-show="r.on" class="i size-3.5"><use href="#i-check"/></svg></span>
+                  </button>
+                </template>
+                <p x-show="pmsg" class="px-2 pt-1 pb-1 text-[11px] font-medium text-warning-ink" x-text="pmsg"></p>
+                <p class="px-2 pt-1 pb-1.5 text-[11px] text-muted-foreground">Only this project's half-days are changed; other projects are never touched.</p>
               </div>
 
               <!-- ============ agenda (téléphone) ============ -->
