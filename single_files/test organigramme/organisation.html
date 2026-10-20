@@ -457,6 +457,36 @@
           roots.forEach((r) => { place(r, left); left += r.w; });
           return { nodes, path: d.join(''), width: Math.max(left, 1) * UX - this.GAP_X, height: (maxDepth + 1) * UY - this.GAP_Y };
         },
+        // ---------- zoom de l'organigramme ----------
+        zoom: (() => { try { const z = parseFloat(localStorage.getItem('maser-org-zoom')); return z >= 0.3 && z <= 2 ? z : 1; } catch (_) { return 1; } })(),
+        ZOOM_STEPS: [0.3, 0.4, 0.5, 0.6, 0.75, 0.9, 1, 1.15, 1.3, 1.5, 1.75, 2],
+        panning: false, pan: { x: 0, y: 0, l: 0, t: 0 },
+        get zoomPct() { return Math.round(this.zoom * 100); },
+        // le zoom garde le centre de la zone visible au même endroit
+        setZoom(z) {
+          const el = this.$refs.chartScroll, old = this.zoom, nz = Math.max(0.3, Math.min(2, Math.round(z * 100) / 100));
+          if (nz === old) return;
+          const cx = el ? (el.scrollLeft + el.clientWidth / 2) / old : 0, cy = el ? (el.scrollTop + el.clientHeight / 2) / old : 0;
+          this.zoom = nz; try { localStorage.setItem('maser-org-zoom', String(nz)); } catch (_) {}
+          if (el) this.$nextTick(() => { el.scrollLeft = cx * nz - el.clientWidth / 2; el.scrollTop = cy * nz - el.clientHeight / 2; });
+        },
+        zoomIn() { this.setZoom(this.ZOOM_STEPS.find((s) => s > this.zoom + 0.001) ?? 2); },
+        zoomOut() { this.setZoom([...this.ZOOM_STEPS].reverse().find((s) => s < this.zoom - 0.001) ?? 0.3); },
+        // ajuste l'arbre à la zone visible (largeur et hauteur)
+        fit() {
+          const el = this.$refs.chartScroll; if (!el) return;
+          this.setZoom(Math.min((el.clientWidth - 48) / this.chart.width, ((window.innerHeight || 800) * 0.78 - 48) / this.chart.height, 1.25));
+          this.$nextTick(() => { el.scrollLeft = 0; el.scrollTop = 0; });
+        },
+        wheelZoom(ev) { if (!(ev.ctrlKey || ev.metaKey)) return; ev.preventDefault(); this.setZoom(this.zoom * (ev.deltaY < 0 ? 1.1 : 1 / 1.1)); },
+        zoomKey(ev) {
+          if (ev.key === '+' || ev.key === '=') { ev.preventDefault(); this.zoomIn(); }
+          else if (ev.key === '-') { ev.preventDefault(); this.zoomOut(); }
+          else if (ev.key === '0') { ev.preventDefault(); this.setZoom(1); }
+        },
+        // glisser le fond pour se déplacer dans l'arbre
+        panStart(ev) { if (ev.button !== 0 || ev.target.closest('button, a, input, select')) return; const el = this.$refs.chartScroll; this.panning = true; this.pan = { x: ev.clientX, y: ev.clientY, l: el.scrollLeft, t: el.scrollTop }; },
+        panMove(ev) { if (!this.panning) return; const el = this.$refs.chartScroll; el.scrollLeft = this.pan.l - (ev.clientX - this.pan.x); el.scrollTop = this.pan.t - (ev.clientY - this.pan.y); },
         toggle(id) { this.collapsed = { ...this.collapsed, [id]: !this.collapsed[id] }; },
         expandAll() { this.collapsed = {}; },
         collapseAll() { const roots = new Set(this.staffAll.filter((m) => !m.supervisorId || !this.staffAll.some((s) => s.id === m.supervisorId)).map((m) => m.id)); this.collapsed = Object.fromEntries(this.staffAll.filter((m) => this.childrenOf(m.id).length && !roots.has(m.id)).map((m) => [m.id, true])); },
@@ -544,6 +574,8 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
     <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
     <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
@@ -562,7 +594,7 @@
 
   <!-- Liste de sécurité : classes appliquées dynamiquement par Alpine -->
   <div class="hidden" aria-hidden="true">
-    <span class="bg-alt/12 text-alt-ink border-alt/25 bg-success/12 text-success-ink border-success/25 bg-warning/12 text-warning-ink border-warning/25 bg-destructive/12 text-destructive-ink border-destructive/25 bg-muted-foreground/12 text-muted-ink border-muted-foreground/25 bg-alt/14 bg-warning/14 bg-success/14 bg-destructive/14 bg-success/14 bg-primary text-primary-foreground bg-success text-success-foreground bg-chart-5 bg-[oklch(.62_.14_70)] text-white bg-[#4f4c4d] bg-muted text-muted-foreground bg-sidebar-accent text-sidebar-accent-foreground text-sidebar-primary text-sidebar-foreground/60 text-sidebar-foreground/80 text-sidebar-foreground/40 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground translate-x-0 -translate-x-full lg:pl-64 opacity-35 line-clamp-2 outline-offset-2 outline-primary text-muted-foreground/45 bg-primary/5 ring-primary -right-4 -bottom-3 bg-primary/5 bg-primary/12 text-primary"></span>
+    <span class="bg-alt/12 text-alt-ink border-alt/25 bg-success/12 text-success-ink border-success/25 bg-warning/12 text-warning-ink border-warning/25 bg-destructive/12 text-destructive-ink border-destructive/25 bg-muted-foreground/12 text-muted-ink border-muted-foreground/25 bg-alt/14 bg-warning/14 bg-success/14 bg-destructive/14 bg-success/14 bg-primary text-primary-foreground bg-success text-success-foreground bg-chart-5 bg-[oklch(.62_.14_70)] text-white bg-[#4f4c4d] bg-muted text-muted-foreground bg-sidebar-accent text-sidebar-accent-foreground text-sidebar-primary text-sidebar-foreground/60 text-sidebar-foreground/80 text-sidebar-foreground/40 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground translate-x-0 -translate-x-full lg:pl-64 cursor-grab cursor-grabbing select-none origin-top-left accent-[var(--primary)] opacity-35 line-clamp-2 outline-offset-2 outline-primary text-muted-foreground/45 bg-primary/5 ring-primary -right-4 -bottom-3 bg-primary/5 bg-primary/12 text-primary"></span>
   </div>
 
   <div :class="layout === 'top' ? 'flex min-h-dvh flex-col' : 'flex min-h-dvh'">
@@ -884,8 +916,20 @@
             <!-- ============ organigramme ============ -->
             <div x-show="orgView !== 'list'" class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
               <div class="card gap-0 overflow-hidden p-0">
-                <div class="overflow-auto p-6" style="max-height: 78dvh">
-                  <div class="relative mx-auto" :style="`width: ${chart.width}px; height: ${chart.height}px`">
+                <!-- zoom -->
+                <div class="flex flex-wrap items-center gap-2 border-b px-4 py-2" role="group" aria-label="Zoom">
+                  <button type="button" class="btn btn-outline btn-square" aria-label="Zoom out" title="Zoom out (−)" @click="zoomOut()" :disabled="zoom <= 0.3"><svg class="i"><use href="#i-minus"/></svg></button>
+                  <input type="range" min="30" max="200" step="5" :value="zoomPct" @input="setZoom($event.target.value / 100)" aria-label="Zoom level" class="h-1.5 w-28 cursor-pointer accent-[var(--primary)] sm:w-40">
+                  <button type="button" class="btn btn-outline btn-square" aria-label="Zoom in" title="Zoom in (+)" @click="zoomIn()" :disabled="zoom >= 2"><svg class="i"><use href="#i-plus"/></svg></button>
+                  <button type="button" class="min-w-14 cursor-pointer rounded-md px-2 py-1 text-center font-mono text-xs tabular-nums hover:bg-muted" title="Back to 100%" @click="setZoom(1)" x-text="zoomPct + '%'"></button>
+                  <button type="button" class="btn btn-outline btn-sm" @click="fit()"><svg class="i"><use href="#i-maximize"/></svg>Fit</button>
+                  <span class="ml-auto hidden text-[11px] text-muted-foreground md:inline">Ctrl/⌘ + scroll to zoom · drag the background to move</span>
+                </div>
+                <div x-ref="chartScroll" tabindex="0" aria-label="Organisation chart (keys + − 0 to zoom)" class="overflow-auto p-6 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                     :class="panning ? 'cursor-grabbing select-none' : 'cursor-grab'" style="max-height: 74dvh"
+                     @wheel="wheelZoom($event)" @keydown="zoomKey($event)" @mousedown="panStart($event)" @mousemove.window="panMove($event)" @mouseup.window="panning = false">
+                  <div class="mx-auto" :style="`width: ${chart.width * zoom}px; height: ${chart.height * zoom}px`">
+                  <div class="relative origin-top-left" :style="`width: ${chart.width}px; height: ${chart.height}px; transform: scale(${zoom})`">
                     <svg class="pointer-events-none absolute inset-0 text-muted-foreground/45" :width="chart.width" :height="chart.height" aria-hidden="true"><path :d="chart.path" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <template x-for="n in chart.nodes" :key="n.id">
                       <div class="absolute transition-opacity" :style="`left: ${n.x}px; top: ${n.y}px; width: ${CARD_W}px; height: ${CARD_H}px`" :class="n.dim ? 'opacity-35' : ''">
@@ -897,13 +941,14 @@
                             <span x-show="n.me" class="absolute -right-4 -bottom-1 rounded bg-primary px-1.5 py-0.5 text-[9px] font-semibold text-primary-foreground">You</span>
                           </span>
                           <span class="mt-2 text-[12px] leading-tight font-bold tracking-wide uppercase" x-text="n.m.name"></span>
-                          <span class="mt-0.5 line-clamp-2 text-[12px] leading-snug font-medium text-primary" x-text="n.m.title"></span>
-                          <span class="mt-auto inline-flex items-center gap-1.5"><span class="badge rounded-md border-transparent text-[10px]" :class="ROLE_TONE[n.eff]" :title="n.inherited ? 'Manager rights inherited from the hierarchy' : ''" x-text="n.eff + (n.inherited ? ' *' : '')"></span><span class="font-mono text-[10px] text-muted-foreground" x-text="n.below + ' below'"></span></span>
+                          <span x-show="zoom >= 0.45" class="mt-0.5 line-clamp-2 text-[12px] leading-snug font-medium text-primary" x-text="n.m.title"></span>
+                          <span x-show="zoom >= 0.6" class="mt-auto inline-flex items-center gap-1.5"><span class="badge rounded-md border-transparent text-[10px]" :class="ROLE_TONE[n.eff]" :title="n.inherited ? 'Manager rights inherited from the hierarchy' : ''" x-text="n.eff + (n.inherited ? ' *' : '')"></span><span class="font-mono text-[10px] text-muted-foreground" x-text="n.below + ' below'"></span></span>
                         </button>
                         <button x-show="n.hasKids" type="button" @click.stop="toggle(n.id)" :aria-label="n.hidden ? 'Expand ' + n.m.name : 'Collapse ' + n.m.name" :aria-expanded="!n.hidden"
                                 class="absolute -bottom-3 left-1/2 z-[2] grid h-6 min-w-6 -translate-x-1/2 cursor-pointer place-items-center rounded-full border bg-card px-1.5 font-mono text-[10px] shadow-xs outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring" x-text="n.hidden ? '+' + n.below : '−'"></button>
                       </div>
                     </template>
+                  </div>
                   </div>
                 </div>
                 <p class="border-t px-4 py-2.5 text-xs text-muted-foreground">Click a person for details · use the round button under a card to fold or unfold their team · * Manager rights inherited from the hierarchy.</p>
