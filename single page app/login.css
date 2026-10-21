@@ -1,0 +1,27 @@
+/* login.css — styles propres à la page de connexion.
+   Tout le reste (tokens de couleur, thème, Tailwind, FlyonUI) vient de main.css.
+   Pas de @apply ici : ce fichier est du CSS natif, il n'a besoin d'aucune référence à Tailwind. */
+
+[x-cloak] { display: none !important; }
+
+/* Décor du panneau de marque : quadrillage technique (la couleur suit le texte du panneau) */
+.login-page .login-grid {
+  background-image:
+    linear-gradient(currentColor 1px, transparent 1px),
+    linear-gradient(90deg, currentColor 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   OPTIONNEL — ajustements pour retrouver exactement le rendu de la maquette.
+   Si, avec le plugin FlyonUI et votre thème, les champs et boutons ont déjà cet aspect,
+   supprimez simplement ce bloc.
+   --------------------------------------------------------------------------------------------- */
+.login-page .btn-lg { height: 2.5rem; }
+.login-page .input {
+  height: 2.5rem;
+  background-color: var(--muted);
+  border-color: var(--input);
+  border-radius: var(--radius);
+}
+.login-page .label-text { font-size: 0.875rem; line-height: 1; font-weight: 500; }
