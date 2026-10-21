@@ -1,14 +1,15 @@
-// src/js/loginData.js — données de test et logique de la page de connexion.
-// Enregistré dans main.js :   Alpine.data('loginData', loginData);   →   <body x-data="loginData">
+// src/js/loginData.js — données de test et logique de la vue « login ».
+// Enregistré dans main.js :   Alpine.data('loginData', loginData);
+// Utilisé dans views/login.html :   <div x-data="loginData()" ...>
 //
-// Tout ce qui est « donnée » (textes de marque, comptes de démonstration, redirection) est ici, dans le
+// Tout ce qui est « donnée » (textes de marque, comptes de démonstration, page d'arrivée) est ici, dans le
 // x-data, pour être remplacé plus tard par l'API. login.html ne contient que l'interface.
 import moment from 'moment';
 
 // ------------------------------------------------------------------ données de test
 export const loginTestData = {
-  // où aller une fois connecté (SPA : adaptez à votre routeur, par ex. '/#/dashboard')
-  redirectTo: '/',
+  // page à afficher une fois connecté : une valeur de « page » dans appData (index.html : x-show="page === '…'")
+  redirectTo: 'dashboard',
 
   // false = comme la maquette : aucune vérification, le bouton ouvre simplement l'application.
   // true  = les identifiants doivent correspondre à un compte de démonstration ci-dessous.
@@ -70,7 +71,15 @@ export default function loginData() {
         try { (this.remember ? localStorage : sessionStorage).setItem(this.sessionKey, account.userId); } catch (_) {}
       }
 
-      window.location.href = this.redirectTo;
+      this.go(this.redirectTo);
+    },
+
+    // Navigation dans la SPA (pas de rechargement : Apps Script sert l'application dans une iframe).
+    //  1. l'évènement « navigate » remonte jusqu'au <body> d'index.html (@navigate="page = $event.detail.page")
+    //  2. si « page » est visible depuis ce composant (appData le fournit), on la change aussi directement
+    go(page) {
+      this.$dispatch('navigate', { page });
+      if ('page' in this) this.page = page;
     },
 
     // remplit le formulaire avec un compte de démonstration (pratique pendant le développement)

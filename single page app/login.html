@@ -1,35 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#4f4c4d">
-  <title>Sign in · Maser Engineering</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e63641'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
-
-  <!-- Polices (à retirer si vous les chargez déjà ailleurs, par ex. dans index.html ou via @fontsource) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Préférences d'affichage (thème, palette, taille) : appliquées avant le premier rendu, pour éviter un flash -->
-  <script>
-    try {
-      var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
-      if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
-      if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
-      if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
-    } catch (_) {}
-  </script>
-
-  <!-- Styles propres à la page ; main.css (Tailwind, FlyonUI, thème) est chargé par main.js -->
-  <link rel="stylesheet" href="/src/css/login.css">
-  <script type="module" src="/src/main.js"></script>
-</head>
-
-<body x-data="loginData">
-  <div class="grid min-h-dvh bg-background text-foreground lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+<!-- Vue « login » — fragment inclus par index.html dans <div x-show="page === 'login'"> (include('login')).
+     Les styles viennent du bundle (main.css + login.css), les données de loginData.js. -->
+<div x-data="loginData()" class="grid min-h-dvh bg-background text-foreground lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
 
     <!-- ============ Panneau de marque ============ -->
     <aside class="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex">
@@ -129,5 +100,3 @@
       </div>
     </main>
   </div>
-</body>
-</html>

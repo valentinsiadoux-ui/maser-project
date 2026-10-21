@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base target="_top">
+    <title>Maser Engineering</title>
+    <meta name="color-scheme" content="light dark">
+
+    <!-- Polices (Inter, IBM Plex Mono). À retirer si vous les chargez autrement (par ex. @fontsource dans main.css) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Préférences d'affichage (thème, palette, taille) : appliquées avant le premier rendu, pour éviter un flash.
+         Les valeurs sont enregistrées par la page Settings dans localStorage « maser-prefs-v1 ». -->
+    <script>
+      try {
+        var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
+        if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
+        if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
+        if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+      } catch (_) {}
+    </script>
+
+    <script type="module" src="./main.js"></script>
+    <style> [x-cloak] { display: none !important; } </style>
+  </head>
+
+  <!-- @navigate : les vues (login, …) demandent un changement de page avec $dispatch('navigate', { page }) -->
+  <body class="bg-background text-foreground" x-data="appData()" x-init="init()" @navigate="page = $event.detail.page">
+    <div x-show="page === 'login'" x-cloak>
+      <?!= include('login'); ?>
+    </div>
+    <div x-show="page === 'dashboard'" x-cloak>
+      <?!= include('dashboard'); ?>
+    </div>
+  </body>
+</html>
