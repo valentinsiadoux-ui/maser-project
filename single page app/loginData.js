@@ -1,17 +1,13 @@
-// loginData.js — données de test et logique de la page de connexion (login.html)
+// src/js/loginData.js — données de test et logique de la page de connexion.
+// Enregistré dans main.js :   Alpine.data('loginData', loginData);   →   <body x-data="loginData">
 //
-// Tout ce qui est « donnée » (textes de marque, comptes de démonstration, redirection) est ici,
-// pour être remplacé plus tard par l'API. Rien n'est lu en dur dans login.html, sauf l'interface
-// (libellés des champs, boutons).
-//
-// Usage :   import { registerLogin } from './loginData.js';  registerLogin(Alpine);  Alpine.start();
-//   - Alpine.store('login')  : contenu et données de test (lecture seule)   → $store.login.brand.title
-//   - Alpine.data('login')   : état du formulaire et actions                → x-data="login"
+// Tout ce qui est « donnée » (textes de marque, comptes de démonstration, redirection) est ici, dans le
+// x-data, pour être remplacé plus tard par l'API. login.html ne contient que l'interface.
 import moment from 'moment';
 
 // ------------------------------------------------------------------ données de test
 export const loginTestData = {
-  // vers où aller une fois connecté (SPA : adaptez à votre routeur, par ex. '/#/dashboard')
+  // où aller une fois connecté (SPA : adaptez à votre routeur, par ex. '/#/dashboard')
   redirectTo: '/',
 
   // false = comme la maquette : aucune vérification, le bouton ouvre simplement l'application.
@@ -47,9 +43,12 @@ export const loginTestData = {
   ],
 };
 
-// ------------------------------------------------------------------ état du formulaire (x-data="login")
-export function loginComponent() {
+// ------------------------------------------------------------------ x-data « loginData »
+export default function loginData() {
   return {
+    ...loginTestData,
+
+    // état du formulaire
     email: '',
     password: '',
     showPassword: false,
@@ -58,33 +57,26 @@ export function loginComponent() {
     year: moment().format('YYYY'),
 
     // texte du pied du panneau de marque
-    get copyright() { return `© ${this.year} ${this.$store.login.company}. All rights reserved.`; },
+    get copyright() { return `© ${this.year} ${this.company}. All rights reserved.`; },
 
     enter() {
-      const data = this.$store.login;
       this.error = '';
 
-      if (data.strict) {
+      if (this.strict) {
         const email = this.email.trim().toLowerCase();
-        const account = data.accounts.find((a) => a.email === email && a.password === this.password);
+        const account = this.accounts.find((a) => a.email === email && a.password === this.password);
         if (!account) { this.error = 'Incorrect email or password.'; return; }
         // « Keep me signed in » : localStorage ; sinon sessionStorage (disparaît à la fermeture de l'onglet)
-        try { (this.remember ? localStorage : sessionStorage).setItem(data.sessionKey, account.userId); } catch (_) {}
+        try { (this.remember ? localStorage : sessionStorage).setItem(this.sessionKey, account.userId); } catch (_) {}
       }
 
-      window.location.href = data.redirectTo;
+      window.location.href = this.redirectTo;
     },
 
     // remplit le formulaire avec un compte de démonstration (pratique pendant le développement)
     useAccount(userId) {
-      const a = this.$store.login.accounts.find((x) => x.userId === userId);
+      const a = this.accounts.find((x) => x.userId === userId);
       if (a) { this.email = a.email; this.password = a.password; }
     },
   };
-}
-
-// ------------------------------------------------------------------ enregistrement auprès d'Alpine
-export function registerLogin(Alpine) {
-  Alpine.store('login', loginTestData);
-  Alpine.data('login', loginComponent);
 }

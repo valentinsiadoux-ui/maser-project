@@ -1,0 +1,168 @@
+/* maser-theme.css — thème Maser Engineering (couleurs, mode clair/sombre, palettes, taille d'interface).
+
+   À importer dans main.css, juste APRÈS vos deux imports (laissez-les tels quels) :
+
+       @import "tailwindcss";
+       @import "flyonui";
+       @import "./maser-theme.css";
+
+   Contenu :
+     1. tokens de couleur (CSS natif, light-dark) + 5 palettes + taille d'interface
+     2. @theme : expose les tokens à Tailwind (bg-background, text-primary, bg-sidebar…)
+     3. liaison avec FlyonUI : ses composants lisent --color-*, on les branche sur nos tokens
+   Les attributs data-theme / data-palette / data-density sont posés sur <html> par le petit script
+   des pages (préférences enregistrées dans localStorage « maser-prefs-v1 »). */
+
+/* ================================================================== 1. tokens */
+:root {
+  color-scheme: light dark;
+  --background: light-dark(#f6f6f6, #1c1b1b);
+  --foreground: light-dark(#2b2929, #f6f6f6);
+  --card: light-dark(#ffffff, #272525);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: #e63641;
+  --primary-foreground: #ffffff;
+  --alt: light-dark(#4f4c4d, #b5b2b3);
+  --secondary: light-dark(#f6f6f6, #333031);
+  --secondary-foreground: var(--alt);
+  --muted: light-dark(#f6f6f6, #333031);
+  --muted-foreground: light-dark(#6f6c6d, #aaa7a8);
+  --accent: light-dark(#f6f6f6, #333031);
+  --accent-foreground: var(--foreground);
+  --success: oklch(0.6 0.13 163);
+  --success-foreground: #ffffff;
+  --warning: oklch(0.75 0.15 70);
+  --warning-foreground: color-mix(in oklch, var(--warning) 65%, var(--foreground));
+  --destructive: oklch(0.58 0.22 27);
+  --border: light-dark(#e6e5e5, #3d3a3b);
+  --input: light-dark(#e6e5e5, #3d3a3b);
+  --ring: #e63641;
+  --chart-1: #e63641;
+  --chart-2: oklch(0.6 0.13 163);
+  --chart-3: oklch(0.75 0.15 70);
+  --chart-4: oklch(0.58 0.22 27);
+  --chart-5: oklch(0.6 0.1 240);
+  --sidebar: #4f4c4d;
+  --sidebar-foreground: #f6f6f6;
+  --sidebar-primary: #e63641;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #625f60;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #625f60;
+  --sidebar-ring: #e63641;
+  --radius: 0.5rem;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/* Palettes alternatives (choisies dans Settings > Appearance) */
+:root[data-palette="ocean"]   { --background: light-dark(#f4f6f9, #121820); --foreground: light-dark(#1b2430, #f1f5f9); --card: light-dark(#fff, #1b232d); --primary: #2f6fe4; --alt: light-dark(#475569, #cbd5e1); --secondary: light-dark(#eef1f6, #263040); --muted: light-dark(#eef1f6, #263040); --muted-foreground: light-dark(#64748b, #94a3b8); --accent: light-dark(#eef1f6, #263040); --border: light-dark(#dde3ec, #334155); --input: light-dark(#dde3ec, #334155); --ring: #2f6fe4; --chart-1: #2f6fe4; --sidebar: #1e293b; --sidebar-foreground: #e2e8f0; --sidebar-primary: #4f8df5; --sidebar-accent: #334155; --sidebar-border: #334155; --sidebar-ring: #4f8df5; }
+:root[data-palette="forest"]  { --background: light-dark(#f5f6f3, #141a16); --foreground: light-dark(#232a25, #f3f6f3); --card: light-dark(#fff, #1e2520); --primary: #1f8a5b; --alt: light-dark(#4a5a50, #bccbc2); --secondary: light-dark(#eef1ec, #2a332d); --muted: light-dark(#eef1ec, #2a332d); --muted-foreground: light-dark(#6b7770, #9aa8a0); --accent: light-dark(#eef1ec, #2a332d); --border: light-dark(#e0e5de, #36413a); --input: light-dark(#e0e5de, #36413a); --ring: #1f8a5b; --chart-1: #1f8a5b; --sidebar: #24332b; --sidebar-foreground: #e8f0ea; --sidebar-primary: #3cb782; --sidebar-accent: #34473c; --sidebar-border: #34473c; --sidebar-ring: #3cb782; }
+:root[data-palette="sunset"]  { --background: light-dark(#f7f5f2, #1c1916); --foreground: light-dark(#2d2825, #f7f3ee); --card: light-dark(#fff, #28231f); --primary: #d9480f; --alt: light-dark(#5c5148, #d3c8bc); --secondary: light-dark(#f1ece6, #38312a); --muted: light-dark(#f1ece6, #38312a); --muted-foreground: light-dark(#7a6f66, #b2a69a); --accent: light-dark(#f1ece6, #38312a); --border: light-dark(#e8e0d7, #4a4137); --input: light-dark(#e8e0d7, #4a4137); --ring: #d9480f; --chart-1: #d9480f; --sidebar: #3b322b; --sidebar-foreground: #f4ece3; --sidebar-primary: #f0702e; --sidebar-accent: #51463c; --sidebar-border: #51463c; --sidebar-ring: #f0702e; }
+:root[data-palette="violet"]  { --background: light-dark(#f6f5f9, #16141c); --foreground: light-dark(#272433, #f4f2fa); --card: light-dark(#fff, #211e2b); --primary: #7c3aed; --alt: light-dark(#4f4a63, #cdc9de); --secondary: light-dark(#efedf5, #2f2b3b); --muted: light-dark(#efedf5, #2f2b3b); --muted-foreground: light-dark(#6f6a80, #a39fb5); --accent: light-dark(#efedf5, #2f2b3b); --border: light-dark(#e3e0ec, #3d3850); --input: light-dark(#e3e0ec, #3d3850); --ring: #7c3aed; --chart-1: #7c3aed; --sidebar: #2e2a40; --sidebar-foreground: #ece9f6; --sidebar-primary: #9d6bf5; --sidebar-accent: #453f5e; --sidebar-border: #453f5e; --sidebar-ring: #9d6bf5; }
+:root[data-palette="graphite"]{ --primary: light-dark(#2b2929, #f6f6f6); --primary-foreground: light-dark(#fff, #1c1b1b); --ring: light-dark(#6f6c6d, #aaa7a8); --chart-1: light-dark(#4f4c4d, #cfcdce); --sidebar: #1c1b1b; --sidebar-foreground: #d9d8d8; --sidebar-primary: #f6f6f6; --sidebar-primary-foreground: #1c1b1b; --sidebar-accent: #333031; --sidebar-border: #333031; --sidebar-ring: #aaa7a8; }
+
+/* Taille d'interface (toute l'UI est en rem) */
+:root[data-density="compact"] { font-size: 14.5px; }
+:root[data-density="large"]   { font-size: 17px; }
+
+[x-cloak] { display: none !important; }
+
+/* ================================================================== 2. Tailwind */
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-alt: var(--alt);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Alias des noms de couleurs FlyonUI, pour une migration future sans retouche */
+  --color-base-100: var(--card);
+  --color-base-200: var(--background);
+  --color-base-300: var(--border);
+  --color-base-content: var(--foreground);
+  --color-error: var(--destructive);
+  --color-info: var(--chart-5);
+}
+
+@layer base {
+  *, ::after, ::before { border-color: var(--border); }
+  * { outline-color: color-mix(in oklab, var(--ring) 50%, transparent); }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
+
+/* ================================================================== 3. FlyonUI
+   Les composants FlyonUI (btn, input, card…) utilisent ces variables : on les pointe sur les tokens
+   Maser pour que leurs couleurs suivent le thème, la palette et le mode sombre.
+   (Règles hors @layer : elles l'emportent sur celles du plugin.) */
+:root,
+:root[data-theme] {
+  --color-base-100: var(--card);
+  --color-base-200: var(--background);
+  --color-base-300: var(--border);
+  --color-base-content: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-content: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-content: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-content: var(--accent-foreground);
+  --color-neutral: var(--alt);
+  --color-neutral-content: var(--background);
+  --color-info: var(--chart-5);
+  --color-info-content: #ffffff;
+  --color-success: var(--success);
+  --color-success-content: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-content: var(--warning-foreground);
+  --color-error: var(--destructive);
+  --color-error-content: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
+}
