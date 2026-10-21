@@ -10,14 +10,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Préférences d'affichage (thème, palette, taille) : appliquées avant le premier rendu, pour éviter un flash.
-         Les valeurs sont enregistrées par la page Settings dans localStorage « maser-prefs-v1 ». -->
+    <!-- Préférences d'affichage (thème, palette, taille, position du menu) : appliquées avant le premier rendu.
+         Valeurs enregistrées par l'application dans localStorage « maser-prefs-v1 ». -->
     <script>
       try {
         var p = JSON.parse(localStorage.getItem('maser-prefs-v1') || '{}'), e = document.documentElement;
         if (p.theme && p.theme !== 'system') e.setAttribute('data-theme', p.theme);
         if (p.palette && p.palette !== 'maser') e.setAttribute('data-palette', p.palette);
         if (p.density && p.density !== 'comfortable') e.setAttribute('data-density', p.density);
+        if (p.navLayout && p.navLayout !== 'side') e.setAttribute('data-nav', p.navLayout);
       } catch (_) {}
     </script>
 
@@ -25,13 +26,53 @@
     <style> [x-cloak] { display: none !important; } </style>
   </head>
 
-  <!-- @navigate : les vues (login, …) demandent un changement de page avec $dispatch('navigate', { page }) -->
-  <body class="bg-background text-foreground" x-data="appData()" x-init="init()" @navigate="page = $event.detail.page">
+  <!-- appData() : page courante + domaine partagé (domain.js).
+       @navigate : les vues (login…) demandent un changement de page avec $dispatch('navigate', { page, params }) -->
+  <body class="bg-background text-foreground" x-data="appData()" x-init="init()" @navigate="navigate($event.detail.page, $event.detail.params)">
+
+    <?!= include('icons'); ?>
+
+    <!-- ============ Connexion ============ -->
     <div x-show="page === 'login'" x-cloak>
       <?!= include('login'); ?>
     </div>
-    <div x-show="page === 'dashboard'" x-cloak>
-      <?!= include('dashboard'); ?>
+
+    <!-- ============ Application (après connexion) : enveloppe + page courante ============ -->
+    <div x-show="page !== 'login'" x-cloak x-data="shellData()" @keydown.escape.window="closeAll()"
+         :class="layout === 'top' ? 'flex min-h-dvh flex-col' : 'flex min-h-dvh'">
+
+      <?!= include('sidebar'); ?>
+
+      <div :class="layout === 'top' ? 'flex min-w-0 flex-1 flex-col' : 'flex min-w-0 flex-1 flex-col lg:pl-64'">
+
+        <?!= include('topbar'); ?>
+
+        <main class="flex-1 px-4 py-6 md:px-8 md:py-8" :class="layout === 'top' ? 'mx-auto w-full max-w-[110rem]' : ''">
+
+          <!-- Zone restreinte (rôle Client) -->
+          <div x-show="isClient" x-cloak class="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
+            <span class="grid size-12 place-items-center rounded-full bg-muted"><svg class="i size-5 text-muted-foreground"><use href="#i-lock"/></svg></span>
+            <h1 class="text-lg font-semibold">Restricted area</h1>
+            <p class="text-sm text-muted-foreground">Client accounts only have access to the Client Space. Switch roles from the profile menu to explore internal views.</p>
+            <a href="#" @click.prevent="navigate('client-space')" class="ui-btn ui-btn-primary">Go to Client Space</a>
+          </div>
+
+          <!-- Pages migrées : une <div x-show="page === '…'"> par vue -->
+          <div x-show="page === 'dashboard'" x-cloak>
+            <?!= include('dashboard'); ?>
+          </div>
+
+          <!-- Pages pas encore migrées -->
+          <div x-show="!isClient && !readyPages.includes(page)" x-cloak class="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
+            <span class="grid size-12 place-items-center rounded-full bg-muted"><svg class="i size-5 text-muted-foreground"><use href="#i-clock"/></svg></span>
+            <h1 class="text-lg font-semibold">Page not migrated yet</h1>
+            <p class="text-sm text-muted-foreground">The “<span x-text="page"></span>” view has not been converted to the SPA yet.</p>
+            <a href="#" @click.prevent="navigate('dashboard')" class="ui-btn ui-btn-outline">Back to dashboard</a>
+          </div>
+        </main>
+      </div>
+
+      <?!= include('dialogs'); ?>
     </div>
   </body>
 </html>

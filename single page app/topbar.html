@@ -1,0 +1,185 @@
+<!-- Barre supérieure (recherche, notifications, profil, menu haut) : inclus par index.html (include('topbar')) — état dans shellData -->
+<!-- ============ Barre supérieure (+ menu haut en option) ============ -->
+      <header class="sticky top-0 z-30">
+        <div class="flex h-16 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur md:px-6">
+
+          <button x-show="layout === 'side'" type="button" @click="mobileOpen = true" class="ui-btn ui-btn-text ui-btn-square lg:hidden" aria-label="Open navigation">
+            <svg class="i"><use href="#i-menu"/></svg>
+          </button>
+          <a x-show="layout === 'top'" x-cloak href="#" @click.prevent="navigate('dashboard')" class="mr-2 flex shrink-0 items-center gap-2.5" aria-label="Maser Engineering — Dashboard">
+            <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-sidebar-primary font-mono text-sm font-bold text-sidebar-primary-foreground">M</span>
+            <span class="flex flex-col leading-none">
+              <span class="text-sm font-semibold tracking-tight text-foreground">Maser</span>
+              <span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">Engineering</span>
+            </span>
+          </a>
+
+          <!-- Recherche globale -->
+          <div class="relative w-full max-w-md" @click.outside="searchOpen = false">
+            <svg aria-hidden="true" class="i pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"><use href="#i-search"/></svg>
+            <input type="search" x-model="query" @input="searchOpen = true" @focus="searchOpen = true"
+                   @keydown.enter="firstResult && navigate(firstResult.page, firstResult.params)"
+                   placeholder="Search projects, tasks, tests, notes..." aria-label="Global search" class="ui-input h-9 pl-9">
+            <div x-show="searchOpen && query.trim()" x-cloak class="absolute inset-x-0 top-full z-50 mt-1.5 overflow-hidden rounded-lg border bg-popover shadow-lg">
+              <p x-show="results.length === 0" class="px-3 py-4 text-sm text-muted-foreground">No results for “<span x-text="query"></span>”</p>
+              <ul x-show="results.length > 0" role="listbox" aria-label="Search results" class="max-h-96 overflow-y-auto p-1">
+                <template x-for="r in results" :key="r.key">
+                  <li :role="r.header ? 'presentation' : 'option'">
+                    <p x-show="r.header" class="px-2.5 pt-2 pb-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase" x-text="r.label"></p>
+                    <button x-show="!r.header" type="button" @click="navigate(r.page, r.params)" class="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-left hover:bg-accent">
+                      <svg class="i size-4 shrink-0" :class="r.kind === 'project' ? 'text-primary' : 'text-muted-foreground'"><use :href="'#i-' + ({ project: 'folder-kanban', task: 'list-checks', test: 'flask-conical', note: 'notebook-pen' })[r.kind]"/></svg>
+                      <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium" x-text="r.title"></span>
+                        <span class="block truncate text-xs text-muted-foreground" x-text="r.sub"></span>
+                      </span>
+                    </button>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ml-auto flex items-center gap-1.5">
+            <button x-show="layout === 'top' && !isClient" x-cloak type="button" @click="openCreate()" class="ui-btn ui-btn-primary mr-1 hidden sm:inline-flex">
+              <svg class="i"><use href="#i-plus"/></svg>
+              New Project
+            </button>
+
+            <!-- Notifications -->
+            <div class="relative" @click.outside="notifOpen = false">
+              <button type="button" @click="notifOpen = !notifOpen; profileOpen = false" class="ui-btn ui-btn-text ui-btn-square relative"
+                      :aria-label="`Notifications, ${unread} unread`" :aria-expanded="notifOpen">
+                <svg class="i"><use href="#i-bell"/></svg>
+                <span x-show="unread > 0" class="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-destructive text-[9px] font-semibold text-white" x-text="unread"></span>
+              </button>
+              <div x-show="notifOpen" x-cloak x-transition.opacity.duration.100ms role="menu"
+                   class="absolute top-full right-0 z-50 mt-1 w-80 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+                <div class="flex items-center justify-between px-1.5 py-1 text-xs font-medium text-muted-foreground">
+                  Notifications <span class="font-normal" x-text="unread + ' new'"></span>
+                </div>
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <template x-for="n in notifications" :key="n.id">
+                  <div role="menuitem" class="flex items-start gap-3 rounded-md px-1.5 py-2 text-sm hover:bg-accent">
+                    <span aria-hidden="true" class="mt-1.5 size-2 shrink-0 rounded-full" :class="n.unread ? 'bg-success' : 'bg-transparent'"></span>
+                    <span class="min-w-0 flex-1">
+                      <span class="block text-sm font-medium" x-text="n.title"></span>
+                      <span class="block truncate text-xs text-muted-foreground" x-text="n.detail"></span>
+                    </span>
+                    <span class="shrink-0 text-[11px] text-muted-foreground" x-text="n.time"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Profil -->
+            <div class="relative" @click.outside="profileOpen = false">
+              <button type="button" @click="profileOpen = !profileOpen; notifOpen = false" class="ui-btn ui-btn-text h-10 gap-2.5 px-2" aria-label="Open profile menu" :aria-expanded="profileOpen">
+                <span class="relative flex size-8 shrink-0 rounded-full select-none">
+                  <span class="flex size-full items-center justify-center rounded-full text-[10px] font-semibold" :class="color(user.id)" x-text="user.initials"></span>
+                </span>
+                <span class="hidden flex-col items-start leading-tight sm:flex">
+                  <span class="text-sm font-medium" x-text="user.name"></span>
+                  <span class="text-[11px] font-normal text-muted-foreground" x-text="user.title"></span>
+                </span>
+                <span class="ui-badge hidden rounded-md border-transparent md:inline-flex" :class="ROLE_TONE[role]" x-text="role"></span>
+                <svg class="i text-muted-foreground"><use href="#i-chevron-down"/></svg>
+              </button>
+
+              <div x-show="profileOpen" x-cloak x-transition.opacity.duration.100ms role="menu"
+                   class="absolute top-full right-0 z-50 mt-1 max-h-[calc(100dvh-5rem)] w-64 overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+                <div class="px-1.5 py-1 text-xs font-medium text-muted-foreground">
+                  <span class="block text-sm font-medium text-foreground" x-text="user.name"></span>
+                  <span class="block text-xs font-normal" x-text="(user.company || 'Maser Engineering') + ' · ' + role"></span>
+                </div>
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+
+                <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-shield-check"/></svg>View as role</div>
+                <template x-for="r in roles" :key="r.role">
+                  <button type="button" role="menuitemradio" :aria-checked="role === r.role" @click="switchRole(r.role)" class="ui-menu-item relative py-1 pr-8">
+                    <span class="flex flex-col">
+                      <span x-text="r.role"></span>
+                      <span class="text-xs text-muted-foreground" x-text="r.description"></span>
+                    </span>
+                    <svg x-show="role === r.role" class="i absolute right-2 size-4"><use href="#i-check"/></svg>
+                  </button>
+                </template>
+
+                <template x-if="sameRole.length > 1">
+                  <div>
+                    <div class="-mx-1 my-1 h-px bg-border"></div>
+                    <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-users"/></svg><span x-text="`Switch person (${role})`"></span></div>
+                    <template x-for="m in sameRole" :key="m.id">
+                      <button type="button" role="menuitemradio" :aria-checked="user.id === m.id" @click="switchUser(m.id)" class="ui-menu-item relative py-1 pr-8">
+                        <span class="flex flex-col">
+                          <span x-text="m.name"></span>
+                          <span class="text-xs text-muted-foreground" x-text="m.title"></span>
+                        </span>
+                        <svg x-show="user.id === m.id" class="i absolute right-2 size-4"><use href="#i-check"/></svg>
+                      </button>
+                    </template>
+                  </div>
+                </template>
+
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <div class="flex items-center gap-1.5 px-1.5 py-1 text-xs font-medium text-muted-foreground"><svg class="i size-3.5"><use href="#i-layout-grid"/></svg>Menu position</div>
+                <button type="button" role="menuitemradio" :aria-checked="layout === 'side'" @click="setLayout('side')" class="ui-menu-item relative py-1 pr-8">Side menu<svg x-show="layout === 'side'" class="i absolute right-2 size-4"><use href="#i-check"/></svg></button>
+                <button type="button" role="menuitemradio" :aria-checked="layout === 'top'" @click="setLayout('top')" class="ui-menu-item relative py-1 pr-8">Top menu<svg x-show="layout === 'top'" class="i absolute right-2 size-4"><use href="#i-check"/></svg></button>
+
+                <div class="-mx-1 my-1 h-px bg-border"></div>
+                <a href="#" @click.prevent="navigate('settings')" role="menuitem" class="ui-menu-item"><svg class="i size-4"><use href="#i-settings"/></svg>Settings</a>
+                <a href="#" @click.prevent="signOut()" role="menuitem" class="ui-menu-item"><svg class="i size-4"><use href="#i-log-out"/></svg>Sign out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu horizontal (position « Top ») -->
+        <nav x-show="layout === 'top'" x-cloak aria-label="Main" class="overflow-x-auto bg-sidebar text-sidebar-foreground">
+          <ul class="mx-auto flex min-w-max items-center gap-0.5 px-3 py-1.5 md:px-6">
+            <template x-for="item in (isClient ? [] : items)" :key="item.page">
+              <li class="flex items-center">
+                <a href="#" @click.prevent="navigate(item.page)" :aria-current="isActive(item.page) ? 'page' : null" :title="item.hint ? `${item.label} (${item.hint})` : item.label"
+                   class="relative flex items-center gap-2 rounded-md px-3 py-1.5 text-sm whitespace-nowrap outline-none transition-colors focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                   :class="isActive(item.page) ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                  <svg class="i size-4" :class="isActive(item.page) ? 'text-sidebar-primary' : 'text-sidebar-foreground/60'"><use :href="'#i-' + item.icon"/></svg>
+                  <span x-text="item.label"></span>
+                </a>
+                <button x-show="item.projects && inProjects" type="button" @click.stop="openProjMenu($event)" aria-haspopup="menu" :aria-expanded="projMenu.open" aria-label="Switch project"
+                        class="-ml-1 grid size-7 cursor-pointer place-items-center rounded-md text-sidebar-foreground/70 outline-none hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring">
+                  <svg class="i size-4"><use href="#i-chevron-down"/></svg>
+                </button>
+              </li>
+            </template>
+            <li class="flex items-center">
+              <span x-show="!isClient" aria-hidden="true" class="mx-2 h-5 w-px bg-sidebar-foreground/20"></span>
+              <a href="#" @click.prevent="navigate('client-space')" class="relative flex items-center gap-2 rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-sidebar-foreground/80 outline-none transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground">
+                <svg class="i size-4 text-sidebar-foreground/60"><use href="#i-building-2"/></svg>
+                Client Space
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Sélecteur de projet (menu en haut) -->
+        <div x-show="projMenu.open" x-cloak @click.outside="projMenu.open = false" role="menu"
+             :style="`position: fixed; top: ${projMenu.y}px; left: ${projMenu.x}px`"
+             class="z-50 max-h-[70dvh] w-72 overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10">
+          <template x-for="g in projectGroups" :key="g.id">
+            <div>
+              <button type="button" @click.stop="toggleGroup(g)" :aria-expanded="isOpen(g)" class="flex w-full cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase hover:bg-accent">
+                <svg class="i size-3 transition-transform" :class="isOpen(g) ? '' : '-rotate-90'"><use href="#i-chevron-down"/></svg>
+                <span class="flex-1 text-left"><span x-text="g.label"></span> <span x-show="g.hint" class="text-[9px] font-normal normal-case italic" x-text="'(' + g.hint + ')'"></span></span>
+                <span class="font-mono text-[10px] normal-case" x-text="g.items.length"></span>
+              </button>
+              <div x-show="isOpen(g)" class="mb-1">
+                <template x-for="p in g.items" :key="p.id">
+                  <a href="#" @click.prevent="navigate('project-detail', { id: p.id })" role="menuitem" :aria-current="p.id === currentProjectId ? 'page' : null" class="ui-menu-item" :class="p.id === currentProjectId ? 'bg-accent font-medium' : ''">
+                    <span class="font-mono text-[10px] text-muted-foreground" x-text="p.code.replace('MSR-', '')"></span>
+                    <span class="truncate" x-text="p.name"></span>
+                  </a>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </header>

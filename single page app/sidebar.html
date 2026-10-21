@@ -1,0 +1,88 @@
+<!-- Barre latérale (tiroir sur mobile) + voile : inclus par index.html (include('sidebar')) — état dans shellData -->
+<!-- ============ Voile du tiroir mobile ============ -->
+    <div x-show="mobileOpen && layout === 'side'" x-cloak x-transition.opacity.duration.150ms @click="mobileOpen = false"
+         class="fixed inset-0 z-40 bg-black/10 backdrop-blur-xs lg:hidden"></div>
+
+    <!-- ============ Barre latérale (tiroir sur mobile) ============ -->
+    <aside x-show="layout === 'side'"
+           class="fixed inset-y-0 left-0 z-50 w-72 border-r border-sidebar-border transition-transform duration-200 ease-in-out lg:z-40 lg:w-64 lg:translate-x-0"
+           :class="mobileOpen ? 'translate-x-0' : '-translate-x-full'" aria-label="Sidebar">
+      <div class="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+        <div class="flex h-16 items-center px-5">
+          <a href="#" @click.prevent="navigate('dashboard')" class="flex items-center gap-2.5" aria-label="Maser Engineering — Dashboard">
+            <span aria-hidden="true" class="grid size-8 place-items-center rounded-md bg-sidebar-primary font-mono text-sm font-bold text-sidebar-primary-foreground">M</span>
+            <span class="flex flex-col leading-none">
+              <span class="text-sm font-semibold tracking-tight text-sidebar-accent-foreground">Maser</span>
+              <span class="mt-0.5 text-[10px] font-medium tracking-[0.18em] text-sidebar-foreground/60 uppercase">Engineering</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="px-3 pb-4" x-show="!isClient">
+          <button type="button" @click="openCreate()" class="ui-btn ui-btn-primary w-full justify-start bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90">
+            <svg class="i"><use href="#i-plus"/></svg>
+            New Project
+          </button>
+        </div>
+
+        <nav aria-label="Main" class="flex-1 overflow-y-auto px-3">
+          <template x-if="!isClient">
+            <div>
+              <p class="px-2 pb-2 text-[11px] font-medium tracking-wider text-sidebar-foreground/50 uppercase">Workspace</p>
+              <ul class="flex flex-col gap-0.5">
+                <template x-for="item in items" :key="item.page">
+                  <li>
+                    <a href="#" @click.prevent="navigate(item.page)" :aria-current="isActive(item.page) ? 'page' : null"
+                       class="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors"
+                       :class="isActive(item.page) ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                      <svg class="i size-4" :class="isActive(item.page) ? 'text-sidebar-primary' : 'text-sidebar-foreground/60'"><use :href="'#i-' + item.icon"/></svg>
+                      <span class="flex-1" x-text="item.label"></span>
+                      <span x-show="item.hint" class="text-[10px] text-sidebar-foreground/40 italic" x-text="item.hint"></span>
+                    </a>
+                    <template x-if="item.projects && inProjects">
+                      <div class="mt-1 mb-1 ml-[1.15rem] flex flex-col gap-1 border-l border-sidebar-border pl-2">
+                        <template x-for="g in projectGroups" :key="g.id">
+                          <div>
+                            <button type="button" @click="toggleGroup(g)" :aria-expanded="isOpen(g)" class="flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium tracking-wide text-sidebar-foreground/60 uppercase hover:text-sidebar-accent-foreground">
+                              <svg class="i size-3 transition-transform" :class="isOpen(g) ? '' : '-rotate-90'"><use href="#i-chevron-down"/></svg>
+                              <span class="flex-1 text-left"><span x-text="g.label"></span> <span x-show="g.hint" class="text-[9px] font-normal normal-case italic" x-text="'(' + g.hint + ')'"></span></span>
+                              <span class="font-mono text-[10px] normal-case" x-text="g.items.length"></span>
+                            </button>
+                            <ul x-show="isOpen(g)" class="mt-0.5 flex flex-col gap-0.5">
+                              <template x-for="p in g.items" :key="p.id">
+                                <li>
+                                  <a href="#" @click.prevent="navigate('project-detail', { id: p.id })" :title="p.code + ' · ' + p.name" :aria-current="p.id === currentProjectId ? 'page' : null"
+                                     class="flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] transition-colors"
+                                     :class="p.id === currentProjectId ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground' : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'">
+                                    <span class="font-mono text-[10px] text-sidebar-foreground/50" x-text="p.code.replace('MSR-', '')"></span>
+                                    <span class="truncate" x-text="p.name"></span>
+                                  </a>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
+          <p class="px-2 pb-2 text-[11px] font-medium tracking-wider text-sidebar-foreground/50 uppercase" :class="isClient ? '' : 'pt-6'">External</p>
+          <ul>
+            <li>
+              <a href="#" @click.prevent="navigate('client-space')" class="group flex items-center gap-3 rounded-md px-2.5 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground">
+                <svg class="i size-4 text-sidebar-foreground/60"><use href="#i-building-2"/></svg>
+                <span class="flex-1">Client Space</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="m-3 rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3">
+          <p class="text-xs font-medium text-sidebar-accent-foreground">Prototype mode</p>
+          <p class="mt-1 text-xs leading-relaxed text-sidebar-foreground/70">Switch roles from the profile menu to preview Admin, Manager, Collaborator and Client views.</p>
+        </div>
+      </div>
+    </aside>
